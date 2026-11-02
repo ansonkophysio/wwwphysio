@@ -8,7 +8,7 @@ Add an article: drop an HTML fragment with a JSON header comment into posts/, th
 import html, json, os, re, shutil, sys
 from datetime import date
 
-ROOT = os.path.dirname(os.path.abspath(__file__))  # this folder holds posts/ and src/
+ROOT = os.path.dirname(os.path.abspath(__file__))
 PREVIEW = "--preview" in sys.argv
 OUT = os.path.join(ROOT, "preview" if PREVIEW else "dist")
 SITE_URL = "https://www.wwwphysio.com"
@@ -25,6 +25,12 @@ FONTS = ("https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700"
 
 NAV = [("index.html", "首頁"), ("services.html", "服務範圍"), ("first-visit.html", "首次診症"),
        ("clinic-info.html", "診所資料"), ("articles.html", "文章"), ("about.html", "關於我")]
+
+# Facts waiting for Anson's confirmation (kept off the live site until confirmed):
+#   - MTR station, exit and walking minutes (clinic-info.html)
+#   - whether balance and strength training is offered (services.html)
+#   - whether family can join the first visit (clinic-info.html)
+#   - qualification line, worded exactly as on the Board registration (about.html)
 
 def todo(text):
     """Facts still to confirm: highlighted on the page, and counted at build time."""
@@ -226,8 +232,6 @@ def build():
   <p>例如扭傷、拉傷、行山或跑步後的膝蓋痛，以及重複出現的舊患。</p>
   <h2>手術後復康</h2>
   <p>例如膝關節或髖關節置換手術後，以及韌帶手術後的康復訓練。</p>
-  <h2>平衡及肌力訓練</h2>
-  <p>{todo("確認是否提供")} 例如為減少跌倒風險而設的平衡及肌力運動。</p>
   <p>治療效果因人而異。評估後，我會向你解釋治療計劃、預計所需時間，以及治療的限制。如症狀持續或出現警號，請諮詢醫生或物理治療師。</p>
   <div class="actions"><a class="btn outline" href="first-visit.html">首次診症須知</a><a class="btn outline" href="clinic-info.html">診所資料</a></div>
 </div>""", "services.html")
@@ -256,7 +260,7 @@ def build():
   <h2>地址</h2>
   <p>{ADDRESS_ZH}</p>
   <p class="small">{ADDRESS_EN}</p>
-  <ul><li>交通：港鐵{todo("尖沙咀／尖東")}站 {todo("X")} 出口，步行約 {todo("X")} 分鐘</li><li>大廈設有升降機，到達 4 樓後請按門鐘。</li></ul>
+  <p>大廈設有升降機，到達 4 樓後請按門鐘。</p>
   <div class="actions"><a class="btn outline" href="{MAP_LINK}">Google 地圖</a></div>
   <h2>聯絡</h2>
   <p>WhatsApp：{WA_NUMBER}</p>
@@ -266,7 +270,7 @@ def build():
   <h2>給家人的資料</h2>
   <p>如你為父母或家人查詢或預約，可直接以 WhatsApp 聯絡，並提供：</p>
   <ul><li>家人的大致情況（例如哪裡痛、是否剛做完手術）</li><li>方便的時間</li></ul>
-  <p>{todo("家人可陪同首次診症。")} 如家人行動不便或需要輪椅，請預先告知，以便安排。</p>
+  <p>如家人行動不便或需要輪椅，請預先告知，以便安排。</p>
 </div>""", "clinic-info.html", BUSINESS)
 
     pages["about.html"] = page("about.html", "關於我",
@@ -276,7 +280,6 @@ def build():
     <p class="lead">高浩維 Anson Ko</p>
     <ul class="prose" style="padding-left:1.2em">
       <li>香港註冊物理治療師 Registered Physiotherapist RPT(HK)</li>
-      <li>BSc (Hons) Physiotherapy (HKPU) {todo("按管理委員會認可格式確認")}</li>
       <li>前港隊水球運動員</li>
       <li>語言：廣東話、英語</li>
     </ul>
