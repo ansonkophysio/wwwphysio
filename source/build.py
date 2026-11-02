@@ -52,7 +52,7 @@ STEPS = ["了解病歷及症狀", "身體檢查及活動能力評估", "解釋�
 # ---------- shared parts ----------
 
 def segs(open_days):
-    cells = "".join(f'<i class="on"></i>' if d in open_days else "<i></i>" for d in DAYS)
+    cells = "".join(f'<i class="on" style="--i:{n}"></i>' if d in open_days else "<i></i>" for n, d in enumerate(DAYS))
     return f'<div class="segs" aria-hidden="true">{cells}</div>'
 
 def hours_card():
@@ -68,9 +68,9 @@ def hours_card():
 
 def visit_block(with_en=False):
     en = f'<br><span class="small">{ADDRESS_EN}</span>' if with_en else ""
-    return f"""<section class="wrap visit" aria-label="診所資料">
+    return f"""<section class="wrap visit reveal" aria-label="診所資料">
   <figure><img src="img/reception.jpg" alt="Amazing Medical 接待處" width="900" height="1200" loading="lazy">
-    <figcaption class="chip glass">Amazing Medical 接待處</figcaption></figure>
+    <figcaption class="chip chip-dark">Amazing Medical 接待處</figcaption></figure>
   <div class="info">
     <h2>診所資料</h2>
     <dl>
@@ -78,7 +78,7 @@ def visit_block(with_en=False):
       <div><dt>應診時間</dt><dd>{HOURS_DL}</dd></div>
       <div><dt>WhatsApp</dt><dd>{WA_NUMBER}<br><span class="small">所有診症均需預約</span></dd></div>
     </dl>
-    <div class="actions"><a class="pill dark" href="{WA_LINK}">WhatsApp 查詢</a><a class="pill line" href="{MAP_LINK}">Google 地圖</a></div>
+    <div class="actions"><a class="pill solid" href="{WA_LINK}">WhatsApp 查詢</a><a class="pill line" href="{MAP_LINK}">Google 地圖</a></div>
   </div>
 </section>"""
 
@@ -86,10 +86,10 @@ def header(active, p):
     links = "".join(
         f'<a href="{p}{href}"{" aria-current=\"page\"" if href == active else ""}>{label}</a>'
         for href, label in NAV)
-    return f"""<header class="site-header"><div class="wrap"><div class="navbar">
+    return f"""<header class="site-header"><div class="wrap"><div class="navbar glass">
   <a class="brand" href="{p}index.html">高浩維 Anson Ko</a>
   <nav class="nav nav-wide" aria-label="主要">{links}</nav>
-  <a class="pill white" href="{WA_LINK}">WhatsApp 查詢</a>
+  <a class="pill solid" href="{WA_LINK}">WhatsApp 查詢</a>
   <details class="menu"><summary>選單</summary><nav class="nav" aria-label="主要">{links}</nav></details>
 </div></div></header>"""
 
@@ -136,7 +136,7 @@ def page(path, title, desc, band, body, active=None, ld=None, og_type="website")
     canonical = SITE_URL + "/" + ("" if path == "index.html" else path)
     head_bits = f"""<title>{html.escape(full_title)}</title>
 <meta name="description" content="{html.escape(desc)}">
-<meta name="theme-color" content="#48658f">
+<meta name="theme-color" content="#93a8cd">
 <link rel="canonical" href="{canonical}">
 <meta property="og:title" content="{html.escape(full_title)}">
 <meta property="og:description" content="{html.escape(desc)}">
@@ -149,6 +149,8 @@ def page(path, title, desc, band, body, active=None, ld=None, og_type="website")
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="{FONTS}">
 <link rel="stylesheet" href="{p}style.css">
+<script>document.documentElement.classList.add("js")</script>
+<script src="{p}site.js" defer></script>
 {jsonld(ld) if ld else ""}"""
     body = body.replace('src="img/', f'src="{p}img/')
     mist_class = "mist" if path == "index.html" else "mist sub"
@@ -194,7 +196,7 @@ def post_cards(posts, p, limit=None):
         f'<li><time datetime="{x["date"]}">{fmt_date(x["date"])}</time>'
         f'<a href="{p}articles/{x["slug"]}.html">{x["title"]}</a><p>{x["description"]}</p></li>'
         for x in posts[:limit])
-    return f'<ul class="post-cards">{items}</ul>' if posts else '<p class="small">文章即將推出。</p>'
+    return f'<ul class="post-cards stagger">{items}</ul>' if posts else '<p class="small">文章即將推出。</p>'
 
 def article_page(x):
     reel = (f'<p>相關短片：<a href="{x["reel"]}">在 Instagram 觀看</a></p>' if x.get("reel") else "")
@@ -229,38 +231,38 @@ def build():
     <h1><span class="zh">高浩維</span><span class="en">Anson Ko</span></h1>
     <p class="role">註冊物理治療師</p>
     <p class="lead">於尖沙咀 Amazing Medical 應診，服務包括肩頸腰背痛、運動創傷及手術後復康。</p>
-    <div class="actions"><a class="pill white" href="{WA_LINK}">WhatsApp {WA_NUMBER}</a><a class="pill clear" href="clinic-info.html">診所資料</a></div>
+    <div class="actions"><a class="pill solid" href="{WA_LINK}">WhatsApp {WA_NUMBER}</a><a class="pill clear" href="clinic-info.html">診所資料</a></div>
   </div>
   <figure class="hero-photo"><img src="img/anson.jpg" alt="註冊物理治療師高浩維 Anson Ko" width="800" height="1000">
-    <figcaption class="chip glass">尖沙咀麼地道　德拓大廈 4 樓</figcaption></figure>
+    <figcaption class="chip chip-dark">尖沙咀麼地道　德拓大廈 4 樓</figcaption></figure>
   {hours_card()}
 </section>"""
 
-    steps = "".join(f"<li class=\"\"><span>{s}</span></li>" for s in STEPS)
+    steps = "".join(f"<li><span>{s}</span></li>" for s in STEPS)
 
     pages["index.html"] = page("index.html", SITE_NAME,
         "高浩維 Anson Ko，香港註冊物理治療師，於尖沙咀 Amazing Medical 應診。服務包括肩頸腰背痛、運動創傷及手術後復康，並以廣東話簡單講解痛症知識。",
         hero,
-        f"""<section class="wrap center">
+        f"""<section class="wrap center reveal">
   <h2>用廣東話，簡單講解<br>痛症和運動創傷</h2>
   <p>物理治療透過評估、運動訓練、手法治療及其他物理治療方法，幫助改善痛楚和活動能力。</p>
 </section>
 
-<div class="wrap cards-scroll"><div class="cards">
+<div class="wrap cards-scroll reveal"><div class="cards stagger">
   <article class="card"><img src="img/treatment-room.jpg" alt="" loading="lazy">
     <div><h3>肩頸、腰背及關節痛</h3><p>例如長時間坐著工作引起的痛楚、膝關節退化。</p></div>
-    <span class="tag glass">治療室</span></article>
+    <span class="tag chip-dark">治療室</span></article>
   <article class="card"><img src="img/gym-area.jpg" alt="" loading="lazy">
     <div><h3>運動創傷</h3><p>例如扭傷、拉傷、行山或跑步後的膝蓋痛。</p></div>
-    <span class="tag glass">運動訓練區</span></article>
+    <span class="tag chip-dark">運動訓練區</span></article>
   <article class="card plain">
     <div><h3>手術後復康</h3><p>例如膝關節或髖關節置換手術後，以及韌帶手術後的康復訓練。</p></div>
     <div class="panel glass"><b>45–60</b><span>分鐘首次診症</span></div></article>
 </div></div>
 
-<section class="wrap statement">
+<section class="wrap statement reveal">
   <p class="big">我會先評估你的痛楚和活動能力，<img class="inline-img" src="img/treatment-room.jpg" alt="">再用廣東話解釋原因，<span class="dim">然後和你一起訂定運動<img class="inline-img" src="img/gym-area.jpg" alt="">及治療計劃。</span></p>
-  <div class="stats">
+  <div class="stats stagger">
     <div><p class="fig">45–60<small>分鐘</small></p><h3>首次診症</h3><p>了解病歷、身體檢查，並解釋評估結果及治療計劃。</p></div>
     <div><p class="fig">HK$900</p><h3>物理治療每節</h3><p>每節 45–60 分鐘。其他治療項目收費，歡迎 WhatsApp 查詢。</p></div>
     <div><p class="fig">5<small>天</small></p><h3>每週應診</h3><p>星期二至六應診；星期日、一及公眾假期休息。</p></div>
@@ -269,9 +271,9 @@ def build():
 
 <section class="deep">
   <div class="wrap">
-    <div class="center"><h2>首次診症</h2><p>首次診症約 45–60 分鐘。</p></div>
-    <ol class="steps">{steps}</ol>
-    <div class="faq">
+    <div class="center reveal"><h2>首次診症</h2><p>首次診症約 45–60 分鐘。</p></div>
+    <div class="reveal"><ol class="steps stagger">{steps}</ol></div>
+    <div class="faq reveal">
       <h2>常見問題</h2>
       <div class="faq-list">
         <details><summary>需要醫生轉介信嗎？</summary><div class="answer-text"><p>{REFERRAL}</p></div></details>
@@ -285,7 +287,7 @@ def build():
 
 {visit_block()}
 
-<section class="wrap">
+<section class="wrap reveal">
   <div class="section-head"><h2>最新文章</h2><a class="pill line" href="articles.html">所有文章</a></div>
   {post_cards(posts, "", 3)}
 </section>""", "index.html", BUSINESS)
@@ -300,7 +302,7 @@ def build():
     <div><h2>手術後復康</h2><p>例如膝關節或髖關節置換手術後，以及韌帶手術後的康復訓練。</p></div>
   </div>
   <p>治療效果因人而異。評估後，我會向你解釋治療計劃、預計所需時間，以及治療的限制。如症狀持續或出現警號，請諮詢醫生或物理治療師。</p>
-  <div class="actions"><a class="pill dark" href="first-visit.html">首次診症須知</a><a class="pill line" href="clinic-info.html">診所資料</a></div>
+  <div class="actions"><a class="pill solid" href="first-visit.html">首次診症須知</a><a class="pill line" href="clinic-info.html">診所資料</a></div>
 </div></div>""", "services.html")
 
     pages["first-visit.html"] = page("first-visit.html", "首次診症",
@@ -315,7 +317,7 @@ def build():
   <p>物理治療每節 HK$900（45–60 分鐘）。其他治療項目收費，歡迎 WhatsApp 查詢。</p>
   <h2>需要醫生轉介信嗎？</h2>
   <p>{REFERRAL}</p>
-  <div class="actions"><a class="pill dark" href="clinic-info.html">診所資料</a></div>
+  <div class="actions"><a class="pill solid" href="clinic-info.html">診所資料</a></div>
 </div></div>""", "first-visit.html")
 
     pages["clinic-info.html"] = page("clinic-info.html", "診所資料",
@@ -344,7 +346,7 @@ def build():
       <li>語言：廣東話、英語</li>
     </ul>
     <p>診症地點：Amazing Medical，尖沙咀麼地道 1–3 號德拓大廈 4 樓全層</p>
-    <div class="actions"><a class="pill dark" href="clinic-info.html">診所資料</a></div>
+    <div class="actions"><a class="pill solid" href="clinic-info.html">診所資料</a></div>
   </div>
 </div>""", "about.html")
 
@@ -355,7 +357,7 @@ def build():
 
     pages["404.html"] = page("404.html", "找不到頁面", "找不到頁面。",
         page_head("找不到頁面"),
-        """<div class="wrap"><a class="pill dark" href="index.html">返回首頁</a></div>""")
+        """<div class="wrap"><a class="pill solid" href="index.html">返回首頁</a></div>""")
 
     for x in posts:
         pages[f'articles/{x["slug"]}.html'] = article_page(x)
@@ -366,6 +368,7 @@ def build():
     for path, text in pages.items():
         open(os.path.join(OUT, path), "w", encoding="utf-8").write(text)
     shutil.copy(os.path.join(ROOT, "src", "style.css"), OUT)
+    shutil.copy(os.path.join(ROOT, "src", "site.js"), OUT)
     shutil.copytree(os.path.join(ROOT, "src", "img"), os.path.join(OUT, "img"))
     open(os.path.join(OUT, "favicon.svg"), "w", encoding="utf-8").write(
         '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">'
