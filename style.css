@@ -634,6 +634,8 @@ main > .cover-wrap:first-child { margin-top: calc(-1 * clamp(4rem, 10vw, 7rem));
 .media-row .frame { position: relative; overflow: hidden; border-radius: var(--r-md); aspect-ratio: 4 / 5; background: var(--soft); }
 .media-row img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 1.1s var(--ease); }
 .media-row figure:hover img { transform: scale(1.04); }
+.media-row.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.media-row.two .frame { aspect-ratio: 1 / 1; }
 .media-row figcaption { color: var(--muted); font-size: 0.92rem; line-height: 1.6; padding-inline: 0.2rem; }
 @media (max-width: 760px) {
   .media-row { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: min(74%, 300px); overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 0.5rem; scrollbar-width: thin; }

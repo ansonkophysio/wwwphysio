@@ -539,8 +539,7 @@ XC = {
   "teaser_field": "為運動隊及比賽提供場邊物理治療支援。",
   "talk_alt": "物理治療師在屏幕前講解，參加者手持練習單張", "field_alt": "物理治療師為球員檢查肩膊活動",
   "field_media": [("video", "img/media/event-room", "為賽事預備的治療區", "預先佈置好的治療區，有幾張治療床和放滿物資的桌子"),
-                  ("img", "img/field-ankle.jpg", "為球員檢查腳踝", "物理治療師俯身檢查躺在地墊上的球員的腳踝"),
-                  ("img", "img/field-venue.jpg", "在比賽場館內檢查運動員的肩膊活動", "物理治療師在場館走廊為舉起手臂的運動員檢查肩膊")],
+                  ("img", "img/field-ankle.jpg", "為球員檢查腳踝", "物理治療師俯身檢查躺在地墊上的球員的腳踝")],
   "gallery_h": "診所環境",
   "gallery": [("img", "img/waiting-area.jpg", "候診區"), ("video", "img/media/gym-area", "運動訓練區"),
               ("img", "img/treatment-room.jpg", "治療室"), ("img", "img/equipment.jpg", "治療儀器")],
@@ -581,8 +580,7 @@ XC = {
   "talk_alt": "A physiotherapist presenting in front of a screen; participants hold exercise handouts",
   "field_alt": "A physiotherapist checking a player's shoulder movement",
   "field_media": [("video", "img/media/event-room", "A treatment area set up for an event", "A treatment area set up in advance, with several treatment tables and tables of supplies"),
-                  ("img", "img/field-ankle.jpg", "Checking a player's ankle", "A physiotherapist bending over to check the ankle of a player lying on a mat"),
-                  ("img", "img/field-venue.jpg", "Checking an athlete's shoulder at a competition venue", "A physiotherapist checking the shoulder of an athlete with a raised arm, in a venue corridor")],
+                  ("img", "img/field-ankle.jpg", "Checking a player's ankle", "A physiotherapist bending over to check the ankle of a player lying on a mat")],
   "gallery_h": "The clinic",
   "gallery": [("img", "img/waiting-area.jpg", "Waiting area"), ("video", "img/media/gym-area", "Exercise area"),
               ("img", "img/treatment-room.jpg", "Treatment room"), ("img", "img/equipment.jpg", "Treatment equipment")],
@@ -667,7 +665,7 @@ def talks_body(lang):
     <ul class="ticks">{li(G["field_exp"])}</ul>
   </div>
 </section>
-<div class="wrap reveal"><div class="media-row stagger">{field_figs}</div></div>
+<div class="wrap reveal"><div class="media-row{" two" if len(G["field_media"]) == 2 else ""} stagger">{field_figs}</div></div>
 <section class="wrap center reveal ask">
   <h2>{G["ask_h"]}</h2>
   <p>{G["ask_p"]}</p>
