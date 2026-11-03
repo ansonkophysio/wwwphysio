@@ -31,6 +31,29 @@
     });
   }
 
+  // Short silent clips: play while on screen, never with reduced motion; the button pauses and resumes
+  document.querySelectorAll("video.clip").forEach((v) => {
+    const btn = v.parentElement.querySelector(".clip-btn");
+    let held = reduce;
+    const sync = () => {
+      if (!btn) return;
+      btn.classList.toggle("paused", v.paused);
+      btn.setAttribute("aria-label", v.paused ? btn.dataset.play : btn.dataset.pause);
+    };
+    const start = () => { const p = v.play(); if (p) p.catch(() => {}); };
+    v.addEventListener("play", sync);
+    v.addEventListener("pause", sync);
+    if (btn) btn.addEventListener("click", () => {
+      if (v.paused) { held = false; start(); } else { held = true; v.pause(); }
+    });
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(([e]) => {
+        if (e.isIntersecting) { if (!held) start(); } else if (!v.paused) v.pause();
+      }, { threshold: 0.25 }).observe(v);
+    } else if (!held) start();
+    sync();
+  });
+
   // Close the phone menu when tapping elsewhere
   document.addEventListener("click", (ev) => {
     document.querySelectorAll("details.menu[open]").forEach((d) => {

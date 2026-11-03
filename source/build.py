@@ -222,8 +222,9 @@ def page(lang, path, title, desc, band, body, active=None, ld=None, og_type="web
 <script>document.documentElement.classList.add("js")</script>
 <script src="{ap}site.js?v={JS_V}" defer></script>
 {jsonld(ld) if ld else ""}"""
-    body = body.replace('src="img/', f'src="{ap}img/')
-    band = band.replace('src="img/', f'src="{ap}img/')
+    for attr in ("src", "poster"):
+        body = body.replace(f'{attr}="img/', f'{attr}="{ap}img/')
+        band = band.replace(f'{attr}="img/', f'{attr}="{ap}img/')
     mist_class = "mist" if path == "index.html" else "mist sub"
     content = (f'<div class="{mist_class}">\n{header(L, lang, active, lp, switch_href)}\n{band}\n</div>\n'
                f"<main>\n{body}\n</main>\n{footer(L)}")
@@ -536,10 +537,17 @@ XC = {
   "more": "了解更多",
   "teaser_talks": "為公司、學校、運動隊及社區團體主持健康講座和工作坊。",
   "teaser_field": "為運動隊及比賽提供場邊物理治療支援。",
-  "talk_alt": "物理治療師在屏幕前講解，台下有觀眾", "field_alt": "物理治療師在泳池邊為運動員處理膝部",
+  "talk_alt": "物理治療師在屏幕前講解，參加者手持練習單張", "field_alt": "物理治療師為球員檢查肩膊活動",
+  "field_media": [("video", "img/media/event-room", "為賽事預備的治療區", "預先佈置好的治療區，有幾張治療床和放滿物資的桌子"),
+                  ("img", "img/field-ankle.jpg", "為球員檢查腳踝", "物理治療師俯身檢查躺在地墊上的球員的腳踝"),
+                  ("img", "img/field-venue.jpg", "在比賽場館內檢查運動員的肩膊活動", "物理治療師在場館走廊為舉起手臂的運動員檢查肩膊")],
   "gallery_h": "診所環境",
-  "gallery": [("img/waiting-area.jpg", "候診區"), ("img/treatment-room.jpg", "治療室"),
-              ("img/equipment.jpg", "治療儀器"), ("img/gym-area.jpg", "運動訓練區")],
+  "gallery": [("img", "img/waiting-area.jpg", "候診區"), ("video", "img/media/gym-area", "運動訓練區"),
+              ("img", "img/treatment-room.jpg", "治療室"), ("img", "img/equipment.jpg", "治療儀器")],
+  "way_h": "怎樣找到診所",
+  "way_steps": ["在麼地道 1–3 號德拓大廈（Yes &amp; Right House）入口進入。", "乘升降機到 4 樓。", "找 Amazing Medical 的玻璃門，按門鐘。"],
+  "way_bldg": "德拓大廈，麼地道 1–3 號", "way_bldg_alt": "德拓大廈入口，可見大廈招牌及門牌「麼地道 1–3 號」",
+  "way_door": "4 樓 Amazing Medical", "way_door_alt": "Amazing Medical 的玻璃門及標誌",
  },
  "en": {
   "page_t": "Talks & on-field support",
@@ -570,26 +578,61 @@ XC = {
   "more": "Learn more",
   "teaser_talks": "Health talks and workshops for companies, schools, sports teams and community groups.",
   "teaser_field": "Field-side physiotherapy for sports teams and events.",
-  "talk_alt": "A physiotherapist presenting in front of a screen to an audience", "field_alt": "A physiotherapist treating an athlete's knee by the pool",
+  "talk_alt": "A physiotherapist presenting in front of a screen; participants hold exercise handouts",
+  "field_alt": "A physiotherapist checking a player's shoulder movement",
+  "field_media": [("video", "img/media/event-room", "A treatment area set up for an event", "A treatment area set up in advance, with several treatment tables and tables of supplies"),
+                  ("img", "img/field-ankle.jpg", "Checking a player's ankle", "A physiotherapist bending over to check the ankle of a player lying on a mat"),
+                  ("img", "img/field-venue.jpg", "Checking an athlete's shoulder at a competition venue", "A physiotherapist checking the shoulder of an athlete with a raised arm, in a venue corridor")],
   "gallery_h": "The clinic",
-  "gallery": [("img/waiting-area.jpg", "Waiting area"), ("img/treatment-room.jpg", "Treatment room"),
-              ("img/equipment.jpg", "Treatment equipment"), ("img/gym-area.jpg", "Exercise area")],
+  "gallery": [("img", "img/waiting-area.jpg", "Waiting area"), ("video", "img/media/gym-area", "Exercise area"),
+              ("img", "img/treatment-room.jpg", "Treatment room"), ("img", "img/equipment.jpg", "Treatment equipment")],
+  "way_h": "Finding the clinic",
+  "way_steps": ["Enter Yes &amp; Right House (德拓大廈) at 1–3 Mody Road.", "Take the lift to 4/F.", "Find the Amazing Medical glass door and ring the doorbell."],
+  "way_bldg": "Yes &amp; Right House, 1–3 Mody Road", "way_bldg_alt": "The entrance of Yes &amp; Right House, showing the building sign and the street number 1–3 Mody Road",
+  "way_door": "Amazing Medical, 4/F", "way_door_alt": "The Amazing Medical glass door and logo",
  },
 }
 
+CLIP_LABELS = {"zh": ("播放影片", "暫停影片"), "en": ("Play video", "Pause video")}
+
+def clip(base, alt, lang):
+    """A short silent loop. site.js plays it while it is on screen (never with reduced motion);
+    without script the poster frame shows. The button pauses and resumes it."""
+    play, pause = CLIP_LABELS[lang]
+    return (f'<video class="clip" muted loop playsinline preload="none" poster="{base}.jpg" aria-label="{alt}">'
+            f'<source src="{base}.mp4" type="video/mp4"></video>'
+            f'<button class="clip-btn" type="button" aria-label="{play}" data-play="{play}" data-pause="{pause}"></button>')
+
+def media(kind, src, alt, lang):
+    return clip(src, alt, lang) if kind == "video" else f'<img src="{src}" alt="{alt}" loading="lazy">'
+
 def gallery(lang):
     G = XC[lang]
-    figs = "".join(f'<figure class="b{i + 1}"><img src="{src}" alt="{cap}" loading="lazy"><figcaption class="chip chip-dark">{cap}</figcaption></figure>'
-                   for i, (src, cap) in enumerate(G["gallery"]))
+    figs = "".join(f'<figure class="b{i + 1}">{media(kind, src, cap, lang)}<figcaption class="chip chip-dark">{cap}</figcaption></figure>'
+                   for i, (kind, src, cap) in enumerate(G["gallery"]))
     return f'<section class="wrap reveal"><h2>{G["gallery_h"]}</h2><div class="bento stagger">{figs}</div></section>'
+
+def wayfind(lang):
+    G, L = XC[lang], T[lang]
+    steps = "".join(f"<li><span>{s}</span></li>" for s in G["way_steps"])
+    return f"""<section class="wrap reveal" id="find">
+  <div class="section-head"><h2>{G["way_h"]}</h2><a class="pill line" href="{MAP_LINK}">{L["map"]}</a></div>
+  <div class="way-grid">
+    <figure class="w1"><img src="img/building-entrance.jpg" alt="{G["way_bldg_alt"]}" width="800" height="1000" loading="lazy">
+      <figcaption class="chip chip-dark">{G["way_bldg"]}</figcaption></figure>
+    <figure class="w2"><img src="img/clinic-door.jpg" alt="{G["way_door_alt"]}" width="1040" height="780" loading="lazy">
+      <figcaption class="chip chip-dark">{G["way_door"]}</figcaption></figure>
+    <ol class="way-steps">{steps}</ol>
+  </div>
+</section>"""
 
 def teaser(lang):
     G = XC[lang]
     return f"""<section class="wrap reveal">
   <div class="section-head"><h2>{G["page_t"]}</h2><a class="pill line" href="talks-onfield.html">{G["more"]}</a></div>
   <div class="teaser-grid stagger">
-    <a class="tcard" href="talks-onfield.html#talks"><img src="img/covers/talks.svg" alt="" loading="lazy"><div><h3>{G["talks_h"]}</h3><p>{G["teaser_talks"]}</p></div></a>
-    <a class="tcard" href="talks-onfield.html#onfield"><img src="img/covers/onfield.svg" alt="" loading="lazy"><div><h3>{G["field_h"]}</h3><p>{G["teaser_field"]}</p></div></a>
+    <a class="tcard" href="talks-onfield.html#talks"><img src="img/card-talks.jpg" alt="" width="1200" height="600" loading="lazy"><div><h3>{G["talks_h"]}</h3><p>{G["teaser_talks"]}</p></div></a>
+    <a class="tcard" href="talks-onfield.html#onfield"><img src="img/card-onfield.jpg" alt="" width="1200" height="600" loading="lazy"><div><h3>{G["field_h"]}</h3><p>{G["teaser_field"]}</p></div></a>
   </div>
 </section>"""
 
@@ -598,8 +641,10 @@ def talks_body(lang):
     chips = lambda items: "".join(f'<span class="chip-topic">{x}</span>' for x in items)
     li = lambda items: "".join(f"<li>{x}</li>" for x in items)
     recent = "".join(f'<li><time>{d}</time><span>{x}</span></li>' for d, x in G["recent"])
+    field_figs = "".join(f'<figure><div class="frame">{media(kind, src, alt, lang)}</div><figcaption>{cap}</figcaption></figure>'
+                         for kind, src, cap, alt in G["field_media"])
     return f"""<section class="wrap feature reveal" id="talks">
-  <figure><img src="img/covers/talks.svg" alt="{G["talk_alt"]}"></figure>
+  <figure><img src="img/talk-workshop.jpg" alt="{G["talk_alt"]}" width="1440" height="898"></figure>
   <div class="feature-text">
     <h2>{G["talks_h"]}</h2>
     <p>{G["talks_p"]}</p>
@@ -611,7 +656,7 @@ def talks_body(lang):
   </div>
 </section>
 <section class="wrap feature reverse reveal" id="onfield">
-  <figure><img src="img/covers/onfield.svg" alt="{G["field_alt"]}"></figure>
+  <figure class="tall"><img src="img/field-shoulder.jpg" alt="{G["field_alt"]}" width="960" height="1200" loading="lazy"></figure>
   <div class="feature-text">
     <h2>{G["field_h"]}</h2>
     <p>{G["field_p"]}</p>
@@ -622,6 +667,7 @@ def talks_body(lang):
     <ul class="ticks">{li(G["field_exp"])}</ul>
   </div>
 </section>
+<div class="wrap reveal"><div class="media-row stagger">{field_figs}</div></div>
 <section class="wrap center reveal ask">
   <h2>{G["ask_h"]}</h2>
   <p>{G["ask_p"]}</p>
@@ -719,6 +765,7 @@ def build_lang(lang, posts, twins):
     pages["clinic-info.html"] = page(lang, "clinic-info.html", L["clinic"], K["ci_desc"],
         page_head(L["clinic"], L["by_appt"] + ("。" if lang == "zh" else ".")),
         f"""{visit_block(L, lang, both_addresses=True)}
+{wayfind(lang)}
 {gallery(lang)}
 <div class="wrap"><div class="prose">
   <h2>{K["fv_ref"]}</h2>
