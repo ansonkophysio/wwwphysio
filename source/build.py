@@ -53,7 +53,7 @@ HOURS_DL = """<dl class="hours">
 
 REFERRAL = "首次預約前，請以 WhatsApp 查詢你的情況是否需要醫生轉介信。如已有轉介信、診斷書或相關報告，請於首次診症時帶備。"
 BRING = "<ul><li>醫生轉介信、診斷書或相關報告（如有）</li><li>X 光或磁力共振報告（如有）</li><li>正在服用的藥物名單</li><li>方便活動的衣服</li></ul>"
-STEPS = ["了解病歷及症狀", "身體檢查及活動能力評估", "解釋評估結果及治療計劃", "按需要開始治療，並教授家居運動"]
+STEPS = ["了解病歷及症狀", "檢查及評估活動能力", "解釋評估結果及治療計劃", "按需要開始治療，並教授家居運動"]
 
 # ---------- shared parts ----------
 
@@ -337,9 +337,9 @@ def build():
 </div></div>
 
 <section class="wrap statement reveal">
-  <p class="big">我會先評估你的痛楚和活動能力，<img class="inline-img" src="img/treatment-room.jpg" alt="">再用廣東話解釋原因，<span class="dim">然後和你一起訂定運動<img class="inline-img" src="img/gym-area.jpg" alt="">及治療計劃。</span></p>
+  <p class="big">我會先評估你的痛楚和活動能力，再用廣東話解釋原因，<span class="dim">然後和你一起訂定運動及治療計劃。</span></p>
   <div class="stats stagger">
-    <div><p class="fig">45–60<small>分鐘</small></p><h3>首次診症</h3><p>了解病歷、身體檢查，並解釋評估結果及治療計劃。</p></div>
+    <div><p class="fig">45–60<small>分鐘</small></p><h3>首次診症</h3><p>了解病歷、進行檢查，並解釋評估結果及治療計劃。</p></div>
     <div><p class="fig">HK$900</p><h3>物理治療每節</h3><p>每節 45–60 分鐘。其他治療項目收費，歡迎 WhatsApp 查詢。</p></div>
     <div><p class="fig">5<small>天</small></p><h3>每週應診</h3><p>星期二至六應診；星期日、一及公眾假期休息。</p></div>
   </div>
@@ -382,7 +382,7 @@ def build():
 </div></div>""", "services.html")
 
     pages["first-visit.html"] = page("first-visit.html", "首次診症",
-        "首次物理治療診症約 45–60 分鐘：了解病歷、身體檢查、解釋評估結果及治療計劃。請帶備轉介信或報告（如有）。收費每節 HK$900。",
+        "首次物理治療診症約 45–60 分鐘：了解病歷、檢查、解釋評估結果及治療計劃。請帶備轉介信或報告（如有）。收費每節 HK$900。",
         page_head("首次診症", "首次診症約 45–60 分鐘。"),
         f"""<div class="wrap"><div class="prose">
   <h2>診症內容</h2>
@@ -410,19 +410,39 @@ def build():
 </div></div>""", "clinic-info.html", BUSINESS)
 
     pages["about.html"] = page("about.html", "關於我",
-        "高浩維 Anson Ko，香港註冊物理治療師，於尖沙咀 Amazing Medical 應診。",
-        page_head("關於我"),
-        """<div class="wrap about">
+        "高浩維 Anson Ko，香港註冊物理治療師，前香港水球隊運動員（2017–2024），於尖沙咀 Amazing Medical 應診，以廣東話講解痛症和運動創傷。",
+        page_head("關於我", "香港註冊物理治療師，前香港水球隊運動員。"),
+        f"""<div class="wrap about">
   <figure><img src="img/anson.jpg" alt="註冊物理治療師高浩維 Anson Ko" width="800" height="1000"></figure>
-  <div class="prose">
-    <h2>高浩維 Anson Ko</h2>
-    <ul>
+  <div class="prose bio">
+    <h2>你好，我是高浩維 Anson Ko</h2>
+    <p class="lead">我是香港註冊物理治療師，於尖沙咀 Amazing Medical 應診。</p>
+    <p>2017 至 2024 年，我是香港水球隊運動員，曾代表香港參加第十九屆亞運會及亞洲水球錦標賽。七年的訓練和比賽，令我切身明白運動員每天要面對的訓練量和比賽壓力，也明白受傷後想盡快重返訓練的心情。</p>
+    <p>現在，我幫助不同的人處理痛症和運動創傷：長時間坐著工作的上班族、週末做運動的朋友、游泳及水上運動愛好者，以及手術後需要復康的人士。</p>
+
+    <div class="facts-row">
+      <div><b>2017–2024</b><span>香港水球隊運動員</span></div>
+      <div><b>第十九屆</b><span>亞運會（水球）</span></div>
+      <div><b>廣東話・英語</b><span>診症語言</span></div>
+    </div>
+
+    <h2>我的做法</h2>
+    <ol class="how">
+      <li><b>先了解</b><span>了解你的病歷、工作和運動習慣，以及你想重新做到的事。</span></li>
+      <li><b>再檢查</b><span>檢查活動能力、肌力和動作，找出可能與痛楚有關的因素。</span></li>
+      <li><b>用廣東話解釋</b><span>清楚說明評估結果、治療計劃、預計所需時間，以及治療的限制。</span></li>
+      <li><b>一起訂定計劃</b><span>以運動訓練為主，按需要配合手法治療等物理治療方法，並教你在家可以做的運動。</span></li>
+    </ol>
+    <p class="small">治療效果因人而異。如症狀持續或出現警號，請諮詢醫生或物理治療師。</p>
+
+    <h2>學歷及專業資格</h2>
+    <ul class="quals">
       <li>香港註冊物理治療師 Registered Physiotherapist RPT(HK)</li>
-      <li>前港隊水球運動員</li>
-      <li>語言：廣東話、英語</li>
+      <li>Bachelor of Science (Hons) in Physiotherapy, The Hong Kong Polytechnic University</li>
     </ul>
-    <p>診症地點：Amazing Medical，尖沙咀麼地道 1–3 號德拓大廈 4 樓全層</p>
-    <div class="actions"><a class="pill solid" href="clinic-info.html">診所資料</a></div>
+
+    <p>我亦會在 <a href="{INSTAGRAM}">Instagram</a> 以廣東話分享痛症和運動知識。</p>
+    <div class="actions"><a class="pill solid" href="clinic-info.html">診所資料</a><a class="pill line" href="first-visit.html">首次診症須知</a></div>
   </div>
 </div>""", "about.html")
 
