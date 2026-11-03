@@ -5,7 +5,7 @@ Usage:  python3 build.py            -> dist/     (the real website)
                                                   document skeleton, for a Claude artifact preview)
 Add an article: drop an HTML fragment with a JSON header comment into posts/, then rebuild.
 """
-import html, json, os, re, shutil, sys
+import hashlib, html, json, os, re, shutil, sys
 from datetime import date
 
 ROOT = os.path.dirname(os.path.abspath(__file__))  # this folder holds posts/ and src/
@@ -20,6 +20,12 @@ ADDRESS_ZH = "九龍尖沙咀麼地道 1–3 號德拓大廈 4 樓全層（Amazi
 ADDRESS_EN = "4/F, Yes & Right House, 1–3 Mody Road, Tsim Sha Tsui, Kowloon"
 INSTAGRAM = "https://www.instagram.com/ansonko_physio/"
 FACEBOOK = "https://www.facebook.com/Ansonkophysio"
+def asset_version(name):
+    return hashlib.sha1(open(os.path.join(ROOT, "src", name), "rb").read()).hexdigest()[:8]
+
+CSS_V = asset_version("style.css")
+JS_V = asset_version("site.js")
+
 FONTS = ("https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500"
          "&family=Chiron+Hei+HK:wght@300;400;500;700&display=swap")
 
@@ -144,13 +150,14 @@ def page(path, title, desc, band, body, active=None, ld=None, og_type="website")
 <meta property="og:url" content="{canonical}">
 <meta property="og:image" content="{SITE_URL}/img/anson.jpg">
 <meta property="og:locale" content="zh_HK">
+<meta name="color-scheme" content="light">
 <link rel="icon" href="{p}favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="{FONTS}">
-<link rel="stylesheet" href="{p}style.css">
+<link rel="stylesheet" href="{p}style.css?v={CSS_V}">
 <script>document.documentElement.classList.add("js")</script>
-<script src="{p}site.js" defer></script>
+<script src="{p}site.js?v={JS_V}" defer></script>
 {jsonld(ld) if ld else ""}"""
     body = body.replace('src="img/', f'src="{p}img/')
     mist_class = "mist" if path == "index.html" else "mist sub"
@@ -191,26 +198,78 @@ def fmt_date(iso):
     y, mo, dd = iso.split("-")
     return f"{int(y)} 年 {int(mo)} 月 {int(dd)} 日"
 
-def post_cards(posts, p, limit=None):
-    items = "".join(
-        f'<li><time datetime="{x["date"]}">{fmt_date(x["date"])}</time>'
-        f'<a href="{p}articles/{x["slug"]}.html">{x["title"]}</a><p>{x["description"]}</p></li>'
-        for x in posts[:limit])
-    return f'<ul class="post-cards stagger">{items}</ul>' if posts else '<p class="small">文章即將推出。</p>'
+def reading_minutes(body):
+    text = re.sub(r"<[^>]+>", "", body)
+    cjk = len(re.findall(r"[㐀-鿿]", text))
+    words = len(re.findall(r"[A-Za-z]+", text))
+    return max(1, round(cjk / 350 + words / 200 + 0.4))
 
-def article_page(x):
+def cover_of(x):
+    return x.get("cover") or "img/covers/default.svg"
+
+def meta_row(x):
+    return (f'<div class="meta-row"><time datetime="{x["date"]}">{fmt_date(x["date"])}</time>'
+            f'<span class="sep"></span><span>閱讀時間約 {reading_minutes(x["body"])} 分鐘</span></div>')
+
+def post_grid(posts, p):
+    items = "".join(
+        f'<li class="post-card" data-topic="{x.get("topic", "")}">'
+        f'<div class="thumb"><img src="{p}{cover_of(x)}" alt="" loading="lazy"></div>'
+        f'<div class="body"><span class="chip-topic">{x.get("topic", "")}</span>'
+        f'<h3><a href="{p}articles/{x["slug"]}.html">{x["title"]}</a></h3>'
+        f'<p class="ex">{x["description"]}</p>{meta_row(x)}</div></li>'
+        for x in posts)
+    return f'<ul class="post-grid stagger">{items}</ul>' if posts else ""
+
+def featured_card(x, p):
+    return f"""<article class="featured">
+  <div class="thumb"><img src="{p}{cover_of(x)}" alt="{x.get("cover_alt", "")}"></div>
+  <div class="body">
+    <p class="label">最新文章</p>
+    <span class="chip-topic" style="justify-self:start">{x.get("topic", "")}</span>
+    <h2><a href="{p}articles/{x["slug"]}.html">{x["title"]}</a></h2>
+    <p class="ex">{x["description"]}</p>
+    <div class="byline"><img src="{p}img/anson-sq.jpg" alt=""><div><b>高浩維 Anson Ko</b><span>註冊物理治療師</span></div></div>
+    {meta_row(x)}
+  </div>
+</article>"""
+
+def add_heading_ids(body):
+    toc = []
+    def repl(m):
+        n = len(toc) + 1
+        text = re.sub(r"<[^>]+>", "", m.group(1)).strip()
+        toc.append((f"s{n}", text))
+        return f'<h2 id="s{n}">{m.group(1)}</h2>'
+    body = re.sub(r"<h2>(.*?)</h2>", repl, body)
+    return body, toc
+
+def article_page(x, posts):
+    body_html, toc = add_heading_ids(x["body"])
+    toc_items = "".join(f'<li><a href="#{i}">{t}</a></li>' for i, t in toc)
     reel = (f'<p>相關短片：<a href="{x["reel"]}">在 Instagram 觀看</a></p>' if x.get("reel") else "")
-    band = f"""<div class="wrap page-head article">
+    others = [o for o in posts if o["slug"] != x["slug"]][:3]
+    more = (f'<section class="wrap reveal"><h2>更多文章</h2>{post_grid(others, "../")}</section>' if others else "")
+    band = f"""<div class="wrap article-head">
+  <nav class="crumbs" aria-label="位置"><a href="../articles.html">文章</a><span aria-hidden="true">›</span><span class="chip-topic">{x.get("topic", "")}</span></nav>
   <h1>{x["title"]}</h1>
-  <p class="meta"><span>{x.get("topic", "")}</span><span>高浩維 Anson Ko，註冊物理治療師</span><span>發佈 {fmt_date(x["date"])}</span><span>更新 {fmt_date(x["updated"])}</span></p>
+  <div class="byline"><img src="../img/anson-sq.jpg" alt=""><div><b>高浩維 Anson Ko</b><span>註冊物理治療師</span></div></div>
+  {meta_row(x)}
 </div>"""
-    body = f"""<div class="wrap"><article class="prose">
-  {x["body"]}
-  {reel}
-  <div class="author"><img src="img/anson-sq.jpg" alt="高浩維 Anson Ko" width="64" height="64">
-    <div><p><b>高浩維 Anson Ko</b></p><p class="small">註冊物理治療師｜<a href="../about.html">關於我</a></p></div></div>
-  <p class="note">本文只供一般參考，不能取代專業診斷及治療。如症狀持續或出現警號，請諮詢醫生或物理治療師。</p>
-</article></div>"""
+    body = f"""<div class="progress" aria-hidden="true"></div>
+<div class="wrap cover-wrap"><img src="{cover_of(x)}" alt="{x.get("cover_alt", "")}"></div>
+<div class="wrap article-grid">
+  <aside class="toc" aria-label="本文內容"><p>本文內容</p><ol>{toc_items}</ol></aside>
+  <article class="article-body">
+    <details class="toc-mobile"><summary>本文內容</summary><ol>{toc_items}</ol></details>
+    {body_html}
+    {reel}
+    <div class="author-box"><img src="img/anson-sq.jpg" alt="高浩維 Anson Ko">
+      <p><b>高浩維 Anson Ko</b><br>註冊物理治療師，於尖沙咀 Amazing Medical 應診。<a href="../about.html">關於我</a></p></div>
+    <p class="note">本文只供一般參考，不能取代專業診斷及治療。如症狀持續或出現警號，請諮詢醫生或物理治療師。</p>
+  </article>
+</div>
+{more}"""
     ld = {"@context": "https://schema.org", "@type": "Article", "headline": x["title"],
           "description": x["description"], "inLanguage": "zh-HK",
           "datePublished": x["date"], "dateModified": x["updated"],
@@ -219,6 +278,23 @@ def article_page(x):
           "mainEntityOfPage": f'{SITE_URL}/articles/{x["slug"]}.html',
           "image": SITE_URL + "/img/anson.jpg"}
     return page(f'articles/{x["slug"]}.html', x["title"], x["description"], band, body, "articles.html", ld, "article")
+
+def articles_body(posts):
+    if not posts:
+        return '<div class="wrap"><p class="small">文章即將推出。</p></div>'
+    topics = []
+    for x in posts:
+        if x.get("topic") and x["topic"] not in topics:
+            topics.append(x["topic"])
+    rest = posts[1:]
+    filters = ""
+    if len(topics) > 1 and rest:
+        btns = '<button type="button" aria-pressed="true" data-filter="">全部</button>' + "".join(
+            f'<button type="button" aria-pressed="false" data-filter="{t}">{t}</button>' for t in topics)
+        filters = f'<div class="filters" role="group" aria-label="按主題篩選">{btns}</div>'
+    grid = (f'<section class="wrap reveal"><div class="section-head"><h2>所有文章</h2>{filters}</div>{post_grid(rest, "")}</section>'
+            if rest else "")
+    return f'<div class="wrap reveal">{featured_card(posts[0], "")}</div>\n{grid}'
 
 # ---------- pages ----------
 
@@ -289,7 +365,7 @@ def build():
 
 <section class="wrap reveal">
   <div class="section-head"><h2>最新文章</h2><a class="pill line" href="articles.html">所有文章</a></div>
-  {post_cards(posts, "", 3)}
+  {post_grid(posts[:3], "")}
 </section>""", "index.html", BUSINESS)
 
     pages["services.html"] = page("services.html", "服務範圍",
@@ -353,14 +429,14 @@ def build():
     pages["articles.html"] = page("articles.html", "文章",
         "註冊物理治療師高浩維 Anson Ko 以簡單易明的方式講解肩頸痛、腰痛、運動創傷等常見問題。",
         page_head("文章", "用簡單的方式，講解常見痛症和運動創傷。"),
-        f"""<div class="wrap">{post_cards(posts, "")}</div>""", "articles.html")
+        articles_body(posts), "articles.html")
 
     pages["404.html"] = page("404.html", "找不到頁面", "找不到頁面。",
         page_head("找不到頁面"),
         """<div class="wrap"><a class="pill solid" href="index.html">返回首頁</a></div>""")
 
     for x in posts:
-        pages[f'articles/{x["slug"]}.html'] = article_page(x)
+        pages[f'articles/{x["slug"]}.html'] = article_page(x, posts)
 
     # ---------- write ----------
     shutil.rmtree(OUT, ignore_errors=True)
@@ -370,6 +446,11 @@ def build():
     shutil.copy(os.path.join(ROOT, "src", "style.css"), OUT)
     shutil.copy(os.path.join(ROOT, "src", "site.js"), OUT)
     shutil.copytree(os.path.join(ROOT, "src", "img"), os.path.join(OUT, "img"))
+    open(os.path.join(OUT, "img", "covers", "default.svg"), "w", encoding="utf-8").write(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">'
+        '<stop offset="0" stop-color="#a9bbdc"/><stop offset="1" stop-color="#eaf0f9"/></linearGradient></defs>'
+        '<rect width="1600" height="900" fill="url(#g)"/><circle cx="1250" cy="220" r="280" fill="#fff" opacity=".35"/>'
+        '<circle cx="260" cy="760" r="320" fill="#fff" opacity=".3"/></svg>')
     open(os.path.join(OUT, "favicon.svg"), "w", encoding="utf-8").write(
         '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">'
         '<stop offset="0" stop-color="#48658f"/><stop offset="1" stop-color="#b3c4dc"/></linearGradient></defs>'

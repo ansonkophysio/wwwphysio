@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360" role="img" aria-label="轉換姿勢：由坐著改為站起來">
+  <rect width="480" height="360" rx="28" fill="#eef2fa"/>
+  <rect x="0" y="300" width="480" height="60" rx="0" fill="#dbe3f1"/>
+  <!-- seated -->
+  <rect x="58" y="214" width="96" height="14" rx="7" fill="#1b2740"/>
+  <rect x="58" y="140" width="14" height="88" rx="7" fill="#1b2740"/>
+  <rect x="98" y="228" width="10" height="72" rx="5" fill="#1b2740"/>
+  <path d="M96 206 L150 206 L150 292" fill="none" stroke="#2c3e66" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M96 200 L104 140" stroke="#7f97c4" stroke-width="44" stroke-linecap="round"/>
+  <circle cx="110" cy="96" r="26" fill="#e8c3a5"/>
+  <!-- arrow -->
+  <path d="M190 170 q50 -50 100 0" fill="none" stroke="#1b2740" stroke-width="8" stroke-linecap="round"/>
+  <path d="M272 150 L292 172 L266 178" fill="none" stroke="#1b2740" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- standing -->
+  <path d="M362 210 L352 296 M372 210 L384 296" stroke="#2c3e66" stroke-width="22" stroke-linecap="round"/>
+  <path d="M366 196 L366 126" stroke="#7f97c4" stroke-width="46" stroke-linecap="round"/>
+  <circle cx="366" cy="78" r="26" fill="#e8c3a5"/>
+  <path d="M348 140 L330 210 M384 140 L402 210" stroke="#7f97c4" stroke-width="16" stroke-linecap="round"/>
+</svg>

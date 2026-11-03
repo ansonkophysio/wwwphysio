@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="坐在電腦前開會的人">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a9bbdc"/><stop offset="1" stop-color="#eaf0f9"/></linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <circle cx="1320" cy="180" r="260" fill="#ffffff" opacity="0.35"/>
+  <circle cx="230" cy="760" r="300" fill="#ffffff" opacity="0.3"/>
+  <!-- wall clock -->
+  <circle cx="330" cy="230" r="78" fill="#ffffff"/>
+  <circle cx="330" cy="230" r="78" fill="none" stroke="#1b2740" stroke-width="8"/>
+  <path d="M330 230 V180 M330 230 L366 252" stroke="#1b2740" stroke-width="9" stroke-linecap="round"/>
+  <circle cx="330" cy="230" r="8" fill="#1b2740"/>
+  <!-- floor -->
+  <rect x="0" y="770" width="1600" height="130" fill="#dbe3f1"/>
+  <!-- desk -->
+  <rect x="880" y="520" width="520" height="26" rx="13" fill="#ffffff"/>
+  <rect x="920" y="546" width="20" height="224" rx="10" fill="#ffffff"/>
+  <rect x="1340" y="546" width="20" height="224" rx="10" fill="#ffffff"/>
+  <!-- laptop -->
+  <rect x="1000" y="504" width="200" height="16" rx="8" fill="#1b2740"/>
+  <path d="M1196 512 L1226 372" stroke="#3a5899" stroke-width="16" stroke-linecap="round"/>
+  <!-- mug -->
+  <rect x="1270" y="462" width="54" height="58" rx="12" fill="#3a5899"/>
+  <path d="M1324 476 q26 4 0 34" fill="none" stroke="#3a5899" stroke-width="10"/>
+  <!-- chair -->
+  <rect x="560" y="390" width="26" height="200" rx="13" fill="#1b2740"/>
+  <rect x="560" y="568" width="240" height="26" rx="13" fill="#1b2740"/>
+  <rect x="672" y="594" width="18" height="150" rx="9" fill="#1b2740"/>
+  <rect x="596" y="736" width="170" height="16" rx="8" fill="#1b2740"/>
+  <!-- legs -->
+  <path d="M660 548 L850 548" stroke="#2c3e66" stroke-width="62" stroke-linecap="round"/>
+  <path d="M850 548 L850 748" stroke="#2c3e66" stroke-width="52" stroke-linecap="round"/>
+  <path d="M846 758 L906 762" stroke="#1b2740" stroke-width="30" stroke-linecap="round"/>
+  <!-- torso, leaning forward -->
+  <path d="M660 540 L730 380" stroke="#7f97c4" stroke-width="120" stroke-linecap="round"/>
+  <!-- neck and head pushed forward -->
+  <path d="M748 342 L790 300" stroke="#e8c3a5" stroke-width="44" stroke-linecap="round"/>
+  <circle cx="826" cy="262" r="62" fill="#e8c3a5"/>
+  <path d="M766 262 a60 60 0 0 1 118 -22 q-40 -6 -66 12 q-24 16 -52 10 z" fill="#1b2740"/>
+  <circle cx="858" cy="262" r="6" fill="#1b2740"/>
+  <!-- arm reaching to the keyboard -->
+  <path d="M730 392 L800 476" stroke="#7f97c4" stroke-width="48" stroke-linecap="round"/>
+  <path d="M800 476 L1000 500" stroke="#e8c3a5" stroke-width="36" stroke-linecap="round"/>
+  <!-- stiffness marks at the neck -->
+  <path d="M716 300 q-26 -20 -18 -52 M690 330 q-34 -10 -40 -44 M738 270 q-10 -30 10 -52" fill="none" stroke="#3a5899" stroke-width="8" stroke-linecap="round" opacity="0.8"/>
+</svg>
