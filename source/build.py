@@ -7,6 +7,7 @@ Add an article: drop an HTML fragment with a JSON header comment into posts/ (Ch
 and, with the same file name, into posts-en/ (English), then rebuild.
 """
 import hashlib, html, json, os, re, shutil, sys
+from urllib.parse import quote
 from datetime import date
 
 ROOT = os.path.dirname(os.path.abspath(__file__))  # this folder holds posts/, posts-en/ and src/
@@ -15,6 +16,9 @@ OUT = os.path.join(ROOT, "preview" if PREVIEW else "dist")
 SITE_URL = "https://www.wwwphysio.com"
 WA_NUMBER = "5592 9407"
 WA_LINK = "https://wa.me/85255929407"
+
+def wa(text):
+    return f"{WA_LINK}?text={quote(text)}"
 MAP_LINK = "https://maps.app.goo.gl/wyFuP1kzYqcNsBYn6"
 ADDRESS_ZH = "九龍尖沙咀麼地道 1–3 號德拓大廈 4 樓全層（Amazing Medical）"
 ADDRESS_EN = "4/F, Yes & Right House, 1–3 Mody Road, Tsim Sha Tsui, Kowloon (Amazing Medical)"
@@ -46,7 +50,8 @@ T = {
   "nav": [("index.html", "首頁"), ("services.html", "服務範圍"), ("talks-onfield.html", "講座及場邊支援"), ("first-visit.html", "首次診症"),
           ("clinic-info.html", "診所資料"), ("articles.html", "文章"), ("about.html", "關於我")],
   "nav_label": "主要", "menu": "選單", "switch": "EN", "switch_label": "English version",
-  "wa": "WhatsApp 查詢", "map": "Google 地圖", "clinic": "診所資料",
+  "wa": "WhatsApp 查詢", "wa_book": "WhatsApp 預約或查詢", "map": "Google 地圖", "clinic": "診所資料",
+  "wa_link": wa("你好，我想查詢物理治療"), "wa_talks_link": wa("你好，我想查詢講座或場邊支援"),
   "days": "一二三四五六日",
   "hours_title": "應診時間", "tue_fri": "星期二至五", "sat": "星期六", "sun_mon": "星期日、一", "ph": "公眾假期",
   "closed": "休息", "hours_note": "公眾假期休息。所有診症均需預約。", "by_appt": "所有診症均需預約",
@@ -54,6 +59,8 @@ T = {
   "reception": "Amazing Medical 接待處",
   "fine": "本網站內容只供一般參考，不能取代專業診斷及治療。",
   "latest": "最新文章", "all_posts": "所有文章", "more_posts": "更多文章", "posts_soon": "文章即將推出。",
+  "latest_sub": "每篇約 {mins} 分鐘讀完，並附有在家或辦公室可以做的簡單動作。",
+  "next_read": "下一篇", "start_h": "由你的情況開始",
   "filter_all": "全部", "filter_label": "按主題篩選",
   "read_min": "閱讀時間約 {n} 分鐘", "crumbs": "位置", "articles": "文章", "toc": "本文內容",
   "reel": "相關短片：", "reel_link": "在 Instagram 觀看",
@@ -68,7 +75,8 @@ T = {
   "nav": [("index.html", "Home"), ("services.html", "Services"), ("talks-onfield.html", "Talks & on-field"), ("first-visit.html", "First visit"),
           ("clinic-info.html", "Clinic info"), ("articles.html", "Articles"), ("about.html", "About")],
   "nav_label": "Main", "menu": "Menu", "switch": "中文", "switch_label": "中文版",
-  "wa": "WhatsApp", "map": "Google Maps", "clinic": "Clinic info",
+  "wa": "WhatsApp", "wa_book": "WhatsApp to book or ask", "map": "Google Maps", "clinic": "Clinic info",
+  "wa_link": wa("Hi, I'd like to ask about physiotherapy"), "wa_talks_link": wa("Hi, I'd like to ask about a talk or on-field support"),
   "days": "MTWTFSS",
   "hours_title": "Opening hours", "tue_fri": "Tue–Fri", "sat": "Sat", "sun_mon": "Sun, Mon", "ph": "Public holidays",
   "closed": "Closed", "hours_note": "Closed on public holidays. By appointment only.", "by_appt": "By appointment only",
@@ -76,6 +84,8 @@ T = {
   "reception": "Amazing Medical reception",
   "fine": "The information on this website is for general reference only and does not replace professional diagnosis or treatment.",
   "latest": "Latest articles", "all_posts": "All articles", "more_posts": "More articles", "posts_soon": "Articles coming soon.",
+  "latest_sub": "Each takes about {mins} minutes to read and includes simple moves you can do at home or at your desk.",
+  "next_read": "Read next", "start_h": "Start with what's bothering you",
   "filter_all": "All", "filter_label": "Filter by topic",
   "read_min": "{n} min read", "crumbs": "Breadcrumb", "articles": "Articles", "toc": "In this article",
   "reel": "Related video: ", "reel_link": "watch on Instagram",
@@ -125,7 +135,7 @@ def visit_block(L, lang, both_addresses=False):
       <div><dt>{L["hours_title"]}</dt><dd>{hours_dl(L)}</dd></div>
       <div><dt>WhatsApp</dt><dd>{WA_NUMBER}<br><span class="small">{L["by_appt"]}</span></dd></div>
     </dl>
-    <div class="actions"><a class="pill solid" href="{WA_LINK}">{L["wa"]}</a><a class="pill line" href="{MAP_LINK}">{L["map"]}</a></div>
+    <div class="actions"><a class="pill solid" href="{L["wa_link"]}">{L["wa_book"]}</a><a class="pill line" href="{MAP_LINK}">{L["map"]}</a></div>
   </div>
 </section>"""
 
@@ -140,7 +150,7 @@ def header(L, lang, active, lp, switch_href):
   <a class="brand" href="{lp}index.html">{L["brand"]}</a>
   <nav class="nav nav-wide" aria-label="{L["nav_label"]}">{links}</nav>
   {sw}
-  <a class="pill solid" href="{WA_LINK}">{L["wa"]}</a>
+  <a class="pill solid" href="{L["wa_link"]}">{L["wa"]}</a>
   <details class="menu"><summary>{L["menu"]}</summary><nav class="nav" aria-label="{L["nav_label"]}">{links}<a href="{switch_href}" lang="{T[other]["html_lang"]}">{L["switch_label"]}</a></nav></details>
 </div></div></header>"""
 
@@ -155,7 +165,7 @@ def footer(L):
     <div class="lead-col"><p>{L["name_short"]}<br>{L["title"]}</p></div>
     <div><h2>{L["hours_title"]}</h2>{hours_dl(L)}</div>
     <div><h2>{L["address"]}</h2><p>{L["address_line"]}</p><p><a href="{MAP_LINK}">{L["map"]}</a></p></div>
-    <div><h2>{L["contact"]}</h2><p>WhatsApp: <a href="{WA_LINK}">{WA_NUMBER}</a></p>
+    <div><h2>{L["contact"]}</h2><p>WhatsApp: <a href="{L["wa_link"]}">{WA_NUMBER}</a></p>
       <p><a href="{INSTAGRAM}">Instagram</a>　<a href="{FACEBOOK}">Facebook</a></p></div>
   </div>
   <div class="fine"><span>{L["fine"]}</span><span>© {date.today().year} 高浩維 Anson Ko</span></div>
@@ -274,6 +284,10 @@ def reading_minutes(body):
     words = len(re.findall(r"[A-Za-z]+", text))
     return max(1, round(cjk / 350 + words / 200 + 0.4))
 
+def mins_range(posts):
+    m = sorted(reading_minutes(x["body"]) for x in posts) or [3]
+    return str(m[0]) if m[0] == m[-1] else f"{m[0]}–{m[-1]}"
+
 def cover_of(x):
     return x.get("cover") or "img/covers/default.svg"
 
@@ -321,7 +335,13 @@ def article_page(x, posts, lang, twins):
     body_html, toc = add_heading_ids(x["body"])
     toc_items = "".join(f'<li><a href="#{i}">{t}</a></li>' for i, t in toc)
     reel = (f'<p>{L["reel"]}<a href="{x["reel"]}">{L["reel_link"]}</a></p>' if x.get("reel") else "")
-    others = [o for o in posts if o["slug"] != x["slug"]][:3]
+    nxt = next((o for o in posts if o["slug"] == x.get("next")), None)
+    next_card = ""
+    if nxt:
+        next_card = (f'<a class="next-read" href="{nxt["slug"]}.html"><span class="label">{L["next_read"]}</span>'
+                     f'<span class="hook">{nxt.get("hook") or nxt["title"]}</span><span class="t">{nxt["title"]}</span>'
+                     f'<span class="meta">{L["read_min"].format(n=reading_minutes(nxt["body"]))}</span></a>')
+    others = [o for o in posts if o["slug"] not in (x["slug"], x.get("next"))][:3]
     more = (f'<section class="wrap reveal"><h2>{L["more_posts"]}</h2>{post_grid(others, lang, "../")}</section>' if others else "")
     band = f"""<div class="wrap article-head">
   <nav class="crumbs" aria-label="{L["crumbs"]}"><a href="../articles.html">{L["articles"]}</a><span aria-hidden="true">›</span><span class="chip-topic">{x.get("topic", "")}</span></nav>
@@ -337,6 +357,7 @@ def article_page(x, posts, lang, twins):
     <details class="toc-mobile"><summary>{L["toc"]}</summary><ol>{toc_items}</ol></details>
     {body_html}
     {reel}
+    {next_card}
     <div class="author-box"><img src="img/anson-sq.jpg" alt="{L["name_short"]}">
       <p><b>{L["name_short"]}</b><br>{L["author_line"]}<a href="../about.html">{L["about"]}</a></p></div>
     <p class="note">{L["article_note"]}</p>
@@ -369,49 +390,61 @@ def articles_body(posts, lang):
         filters = f'<div class="filters" role="group" aria-label="{L["filter_label"]}">{btns}</div>'
     grid = (f'<section class="wrap reveal"><div class="section-head"><h2>{L["all_posts"]}</h2>{filters}</div>{post_grid(rest, lang, "")}</section>'
             if rest else "")
-    return f'<div class="wrap reveal">{featured_card(posts[0], lang)}</div>\n{grid}'
+    picks = [x for x in posts if x.get("situation")][:4]
+    start = ""
+    if len(picks) > 1:
+        links = "".join(f'<li><a href="articles/{x["slug"]}.html">{x["situation"]}</a></li>' for x in picks)
+        start = f'<section class="wrap reveal start-here"><h2>{L["start_h"]}</h2><ul class="situations">{links}</ul></section>\n'
+    return f'{start}<div class="wrap reveal">{featured_card(posts[0], lang)}</div>\n{grid}'
 
 # ---------- page content, per language ----------
 
 C = {
  "zh": {
-  "home_desc": "高浩維 Anson Ko，香港註冊物理治療師，於尖沙咀 Amazing Medical 應診。服務包括肩頸腰背痛、運動創傷及手術後復康。",
+  "home_desc": "長時間坐著工作後肩頸腰背痛、跑步或行山後膝蓋痛、運動創傷，或手術後復康？註冊物理治療師高浩維 Anson Ko 於尖沙咀 Amazing Medical 應診，首次診症約 45–60 分鐘。",
   "h1": '<span class="n1">高浩維</span><span class="n2">Anson Ko</span>',
-  "lead": "於尖沙咀 Amazing Medical 應診，服務包括肩頸腰背痛、運動創傷及手術後復康。",
+  "lead": "坐了一整天肩頸僵硬、腰背痛，或者跑步、行山後膝蓋痛？我會先評估，用簡單的說話解釋原因，再和你一起訂定做得到的計劃。於尖沙咀 Amazing Medical 應診。",
   "photo_alt": "註冊物理治療師高浩維 Anson Ko", "chip": "尖沙咀麼地道　德拓大廈 4 樓",
-  "intro_h": "從評估開始，<br>按你的情況訂定計劃",
-  "intro_p": "物理治療透過評估、運動訓練、手法治療及其他物理治療方法，幫助改善痛楚和活動能力。",
-  "cards": [("肩頸、腰背及關節痛", "例如長時間坐著工作引起的痛楚、膝關節退化。", "治療室"),
-            ("運動創傷", "例如扭傷、拉傷、行山或跑步後的膝蓋痛。", "運動訓練區"),
-            ("手術後復康", "例如膝關節或髖關節置換手術後，以及韌帶手術後的康復訓練。", "")],
+  "intro_h": "先弄清楚原因，<br>再一起決定下一步",
+  "intro_p": "物理治療透過評估、運動訓練、手法治療等方法，幫助改善痛楚和活動能力。計劃會圍繞你想做回的事來訂定，例如安坐開完一個長會、行完一段山路，或者抱起小朋友。",
+  "cards": [("肩頸、腰背及關節痛", "坐了一整天，肩頸僵硬、腰背痛；手腕、手肘痛；膝關節退化。", "治療室"),
+            ("運動創傷", "扭傷腳踝、拉傷、行山落樓梯時膝蓋痛，或者反覆出現的舊患。", "運動訓練區"),
+            ("手術後復康", "膝關節或髖關節置換、韌帶手術後，分階段進行康復訓練。", "")],
   "panel": ("45–60", "分鐘首次診症"),
-  "statement": "我會先評估你的痛楚和活動能力，再解釋原因，<span class=\"dim\">然後和你一起訂定運動及治療計劃。</span>",
+  "statement": "痛楚令你少做了哪一件事？<span class=\"dim\">你的治療計劃，就從這個答案開始。</span>",
   "stats": [("45–60<small>分鐘</small>", "首次診症", "了解病歷、進行檢查，並解釋評估結果及治療計劃。"),
             ("HK$900", "物理治療每節", "每節 45–60 分鐘。其他治療項目收費，歡迎 WhatsApp 查詢。"),
             ("5<small>天</small>", "每週應診", "星期二至六應診；星期日、一及公眾假期休息。")],
-  "first_h": "首次診症", "first_p": "首次診症約 45–60 分鐘。",
-  "steps": ["了解病歷及症狀", "檢查及評估活動能力", "解釋評估結果及治療計劃", "按需要開始治療，並教授家居運動"],
+  "first_h": "首次診症", "first_p": "第一次來，不知道會做甚麼？首次診症約 45–60 分鐘，分四步。",
+  "steps": ["了解你的病歷、症狀，以及你最想做回的事", "檢查及評估活動能力", "用簡單的說話解釋評估結果及治療計劃", "按需要開始治療，並教你回家可以做的運動"],
   "faq_h": "常見問題",
   "referral": "首次預約前，請以 WhatsApp 查詢你的情況是否需要醫生轉介信。如已有轉介信、診斷書或相關報告，請於首次診症時帶備。",
   "bring": "<ul><li>醫生轉介信、診斷書或相關報告（如有）</li><li>X 光或磁力共振報告（如有）</li><li>正在服用的藥物名單</li><li>方便活動的衣服</li></ul>",
   "fee": "物理治療每節 HK$900（45–60 分鐘）。其他治療項目收費，歡迎 WhatsApp 查詢。",
   "family_q": "可以為父母或家人查詢嗎？",
   "family_a": "可以。請以 WhatsApp 聯絡，並提供家人的大致情況（例如哪裡痛、是否剛做完手術）及方便的時間。如家人行動不便或需要輪椅，請預先告知。",
-  "faq": [("需要醫生轉介信嗎？", "referral"), ("首次診症要帶甚麼？", "bring"), ("收費多少？", "fee")],
+  "sessions": "因人而異，視乎你的情況和目標。首次評估後，我會解釋預計所需的時間和次數，以及你在家可以做甚麼。",
+  "not_fit": "評估後，如果我認為你需要先看醫生或做進一步檢查，我會直接告訴你，並協助你找合適的醫護人員跟進。",
+  "faq": [("需要醫生轉介信嗎？", "referral"), ("首次診症要帶甚麼？", "bring"), ("收費多少？", "fee"),
+          ("需要做多少次治療？", "sessions"), ("如果物理治療不適合我呢？", "not_fit")],
   "services_t": "服務範圍",
   "services_desc": "高浩維 Anson Ko 的物理治療服務：肩頸、腰背及關節痛、運動創傷、手術後復康。於尖沙咀 Amazing Medical 應診。",
-  "services_rows": [("肩頸、腰背及關節痛", "例如長時間坐著工作引起的肩頸或腰背痛楚、手腕及手肘痛、膝關節退化。"),
-                    ("運動創傷", "例如扭傷、拉傷、行山或跑步後的膝蓋痛，以及重複出現的舊患。"),
-                    ("手術後復康", "例如膝關節或髖關節置換手術後，以及韌帶手術後的康復訓練。")],
-  "limits": "治療效果因人而異。評估後，我會向你解釋治療計劃、預計所需時間，以及治療的限制。如症狀持續或出現警號，請諮詢醫生或物理治療師。",
-  "first_visit_link": "首次診症須知",
+  "services_rows": [("肩頸、腰背及關節痛", "例如坐了一整天後肩頸僵硬（頸梗膊痛）、腰背痛，手腕及手肘痛，以及膝關節退化。計劃可包括運動訓練、手法治療，以及你在家或辦公室可以做的動作。"),
+                    ("運動創傷", "例如扭傷腳踝（拗柴）、肌肉拉傷、跑步或行山後膝蓋痛，以及反覆出現的舊患。計劃會按你做的運動和目標，逐步安排重返訓練。"),
+                    ("手術後復康", "例如膝關節或髖關節置換手術後，以及韌帶手術後。計劃會按手術醫生的指示和你的進度，分階段進行康復訓練。")],
+  "limits": "物理治療並不適合所有情況，效果亦因人而異。評估後，我會向你解釋治療計劃、預計所需時間，以及治療的限制；如果你的情況需要先看醫生，我會直接告訴你。如症狀持續或出現警號，請諮詢醫生或物理治療師。",
+  "first_visit_link": "第一次來？看看流程",
+  "fv_ready_h": "來之前，不用先知道自己是甚麼問題",
+  "fv_ready": "<p>想一想以下三點，首次見面時告訴我就可以：</p><ul><li>哪裡不舒服，從甚麼時候開始</li><li>甚麼動作或姿勢會令情況好轉或變差</li><li>痛楚令你少做了哪一件事</li></ul>",
+  "fv_book_h": "預約方法",
+  "fv_book": "以 WhatsApp 傳訊息到 5592 9407，告訴我你的名字、方便的日子和時間，以及大致情況（例如哪裡痛、是否剛做完手術）。我會回覆可預約的時間。",
   "fv_desc": "首次物理治療診症約 45–60 分鐘：了解病歷、檢查、解釋評估結果及治療計劃。請帶備轉介信或報告（如有）。收費每節 HK$900。",
   "fv_what": "診症內容", "fv_bring": "請帶備", "fv_fee": "收費", "fv_ref": "需要醫生轉介信嗎？",
   "ci_desc": "應診時間、地址及交通：九龍尖沙咀麼地道 1–3 號德拓大廈 4 樓全層（Amazing Medical）。WhatsApp 5592 9407。",
   "ci_family_h": "給家人的資料",
   "ci_family": "<p>如你為父母或家人查詢或預約，可直接以 WhatsApp 聯絡，並提供：</p><ul><li>家人的大致情況（例如哪裡痛、是否剛做完手術）</li><li>方便的時間</li></ul><p>如家人行動不便或需要輪椅，請預先告知，以便安排。</p>",
   "articles_desc": "註冊物理治療師高浩維 Anson Ko 以簡單易明的方式講解肩頸痛、腰痛、運動創傷等常見問題。",
-  "articles_intro": "用簡單的方式，講解常見痛症和運動創傷。",
+  "articles_intro": "哪裡不舒服？用簡單的方式講解常見痛症和運動創傷，每篇約 {mins} 分鐘讀完。",
   "nf_t": "找不到頁面", "nf_link": "返回首頁",
   "about_desc": "高浩維 Anson Ko，香港註冊物理治療師，香港水球隊物理治療師，前香港水球隊運動員（2017–2024），於尖沙咀 Amazing Medical 應診。",
   "about_intro": "香港註冊物理治療師。前香港水球隊運動員，現任香港水球隊物理治療師。",
@@ -441,43 +474,50 @@ C = {
   "ig_line": '我亦會在 <a href="{ig}">Instagram</a> 分享痛症和運動知識。',
  },
  "en": {
-  "home_desc": "Anson Ko is a Registered Physiotherapist in Hong Kong, seeing patients at Amazing Medical, Tsim Sha Tsui. Services include neck, back and joint pain, sports injuries and rehabilitation after surgery.",
+  "home_desc": "Neck or back pain from long hours at a desk, knee pain after running or hiking, a sports injury, or rehab after surgery? Registered Physiotherapist Anson Ko sees patients at Amazing Medical, Tsim Sha Tsui. A first visit takes about 45–60 minutes.",
   "h1": '<span class="n1">Anson Ko</span><span class="n2">高浩維</span>',
-  "lead": "Seeing patients at Amazing Medical, Tsim Sha Tsui. Services include neck, back and joint pain, sports injuries and rehabilitation after surgery.",
+  "lead": "Stiff neck and sore back after a day at your desk, or knee pain after a run or a hike? I'll assess you, explain what's going on in plain language, and we'll agree on a plan that fits your day. At Amazing Medical, Tsim Sha Tsui.",
   "photo_alt": "Registered Physiotherapist Anson Ko", "chip": "4/F, Yes & Right House, Mody Road",
-  "intro_h": "It starts with an assessment,<br>and a plan that fits you",
-  "intro_p": "Physiotherapy uses assessment, exercise training, manual therapy and other physiotherapy methods to help improve pain and movement.",
-  "cards": [("Neck, back and joint pain", "For example, pain from long hours sitting at work, or knee osteoarthritis.", "Treatment room"),
-            ("Sports injuries", "For example, sprains, strains, and knee pain after hiking or running.", "Exercise area"),
-            ("Rehab after surgery", "For example, rehabilitation after a knee or hip replacement, or ligament surgery.", "")],
+  "intro_h": "First, understand why.<br>Then decide the next step together",
+  "intro_p": "Physiotherapy uses assessment, exercise training, manual therapy and other methods to help improve pain and movement. Your plan is built around what you want to get back to: sitting through a long meeting, finishing a hike, or picking up your child.",
+  "cards": [("Neck, back and joint pain", "A stiff neck and sore back after a day at your desk; wrist or elbow pain; knee osteoarthritis.", "Treatment room"),
+            ("Sports injuries", "A rolled ankle, a strain, knee pain on the way down a hike, or an old injury that keeps coming back.", "Exercise area"),
+            ("Rehab after surgery", "After a knee or hip replacement or ligament surgery, rehabilitation in stages.", "")],
   "panel": ("45–60", "minutes, first visit"),
-  "statement": "I start by assessing your pain and movement, then explain what's going on in plain language, <span class=\"dim\">and we agree on an exercise and treatment plan together.</span>",
+  "statement": "What has pain stopped you doing? <span class=\"dim\">Your treatment plan starts from that answer.</span>",
   "stats": [("45–60<small>min</small>", "First visit", "Your history, an examination, and an explanation of the findings and treatment plan."),
             ("HK$900", "Per physiotherapy session", "Each session is 45–60 minutes. For other treatment fees, please ask on WhatsApp."),
             ("5<small>days</small>", "Open each week", "Tuesday to Saturday. Closed on Sunday, Monday and public holidays.")],
-  "first_h": "Your first visit", "first_p": "A first visit takes about 45–60 minutes.",
-  "steps": ["Your history and symptoms", "Examination and movement assessment", "The findings and treatment plan, explained", "Treatment as needed, plus exercises for home"],
+  "first_h": "Your first visit", "first_p": "Not sure what happens at a first visit? It takes about 45–60 minutes, in four steps.",
+  "steps": ["Your history, your symptoms, and what you most want to get back to", "Examination and movement assessment", "The findings and treatment plan, explained in plain language", "Treatment as needed, plus exercises to do at home"],
   "faq_h": "Common questions",
   "referral": "Before your first appointment, please ask on WhatsApp whether your situation needs a doctor's referral letter. If you already have a referral letter, medical certificate or reports, please bring them to your first visit.",
   "bring": "<ul><li>Doctor's referral letter, medical certificate or related reports (if any)</li><li>X-ray or MRI reports (if any)</li><li>A list of the medicines you take</li><li>Comfortable clothes you can move in</li></ul>",
   "fee": "HK$900 per physiotherapy session (45–60 minutes). For other treatment fees, please ask on WhatsApp.",
   "family_q": "Can I enquire for a parent or family member?",
   "family_a": "Yes. Send a WhatsApp message with a short description of their situation (for example, where it hurts, or whether they have just had surgery) and the times that suit them. If they have limited mobility or use a wheelchair, please let me know in advance.",
-  "faq": [("Do I need a doctor's referral?", "referral"), ("What should I bring to my first visit?", "bring"), ("How much does it cost?", "fee")],
+  "sessions": "It depends on your situation and your goals. After the first assessment, I'll explain how long it is likely to take, roughly how many sessions, and what you can do at home.",
+  "not_fit": "If, after the assessment, I think you need to see a doctor or have further tests first, I'll tell you directly and help you find the right person to follow up.",
+  "faq": [("Do I need a doctor's referral?", "referral"), ("What should I bring to my first visit?", "bring"), ("How much does it cost?", "fee"),
+          ("How many sessions will I need?", "sessions"), ("What if physiotherapy isn't right for me?", "not_fit")],
   "services_t": "Services",
   "services_desc": "Physiotherapy services by Anson Ko: neck, back and joint pain, sports injuries, and rehabilitation after surgery. At Amazing Medical, Tsim Sha Tsui.",
-  "services_rows": [("Neck, back and joint pain", "For example, neck or back pain from long hours sitting at work, wrist and elbow pain, or knee osteoarthritis."),
-                    ("Sports injuries", "For example, sprains, strains, knee pain after hiking or running, and old injuries that keep coming back."),
-                    ("Rehab after surgery", "For example, rehabilitation after a knee or hip replacement, or after ligament surgery.")],
-  "limits": "Results vary from person to person. After the assessment, I'll explain the treatment plan, how long it is likely to take, and its limits. If symptoms persist or warning signs appear, please see a doctor or physiotherapist.",
-  "first_visit_link": "Your first visit",
+  "services_rows": [("Neck, back and joint pain", "For example, a stiff neck and shoulders or a sore back after a day at your desk, wrist and elbow pain, and knee osteoarthritis. Your plan may include exercise training, manual therapy, and moves you can do at home or at your desk."),
+                    ("Sports injuries", "For example, a sprained ankle, a muscle strain, knee pain after running or hiking, and old injuries that keep coming back. Your plan is built around your sport and goals, with a step-by-step return to training."),
+                    ("Rehab after surgery", "For example, after a knee or hip replacement, or ligament surgery. Rehabilitation goes in stages, following your surgeon's instructions and your progress.")],
+  "limits": "Physiotherapy isn't right for every problem, and results vary from person to person. After the assessment, I'll explain the treatment plan, how long it is likely to take, and its limits; if you need to see a doctor first, I'll tell you directly. If symptoms persist or warning signs appear, please see a doctor or physiotherapist.",
+  "first_visit_link": "First time? See how it works",
+  "fv_ready_h": "You don't need to know what's wrong before you come",
+  "fv_ready": "<p>Just think about these three things and tell me at your first visit:</p><ul><li>Where it bothers you, and when it started</li><li>Which movements or positions make it better or worse</li><li>What the pain has stopped you doing</li></ul>",
+  "fv_book_h": "How to book",
+  "fv_book": "Send a WhatsApp message to 5592 9407 with your name, the days and times that suit you, and a short description (for example, where it hurts, or whether you've just had surgery). I'll reply with the times available.",
   "fv_desc": "A first physiotherapy visit takes about 45–60 minutes: your history, an examination, and an explanation of the findings and treatment plan. Please bring any referral letter or reports. HK$900 per session.",
   "fv_what": "What happens", "fv_bring": "What to bring", "fv_fee": "Fees", "fv_ref": "Do I need a doctor's referral?",
   "ci_desc": "Opening hours and address: 4/F, Yes & Right House, 1–3 Mody Road, Tsim Sha Tsui (Amazing Medical). WhatsApp 5592 9407.",
   "ci_family_h": "For family members",
   "ci_family": "<p>If you are enquiring or booking for a parent or family member, you can send a WhatsApp message with:</p><ul><li>a short description of their situation (for example, where it hurts, or whether they have just had surgery)</li><li>the times that suit them</li></ul><p>If they have limited mobility or use a wheelchair, please let me know in advance so I can plan for it.</p>",
   "articles_desc": "Registered Physiotherapist Anson Ko explains common problems such as neck pain, back pain and sports injuries in plain language.",
-  "articles_intro": "Common pain and sports injuries, explained simply.",
+  "articles_intro": "Where does it bother you? Common pain and sports injuries, explained simply, each in about {mins} minutes.",
   "nf_t": "Page not found", "nf_link": "Back to home",
   "about_desc": "Anson Ko is a Registered Physiotherapist in Hong Kong, Team Physiotherapist for the Hong Kong Water Polo Team and a former Hong Kong water polo player (2017–2024), seeing patients at Amazing Medical, Tsim Sha Tsui.",
   "about_intro": "Registered Physiotherapist in Hong Kong. Former Hong Kong Water Polo Team player, now the team's physiotherapist.",
@@ -517,7 +557,7 @@ XC = {
   "page_desc": "註冊物理治療師高浩維 Anson Ko 為公司、學校、運動隊及社區團體提供健康講座、工作坊及場邊物理治療支援。",
   "page_intro": "為公司、學校、運動隊及社區團體提供健康講座、工作坊及場邊物理治療支援。",
   "talks_h": "講座及工作坊",
-  "talks_p": "我為公司、學校、運動隊及社區團體主持健康講座和工作坊。內容以健康教育為主，並包括示範和簡單練習，讓參加者帶走在日常生活中可以做的事。",
+  "talks_p": "我為公司、學校、運動隊及社區團體主持健康講座和工作坊。內容以健康教育為主，每次都包括示範和練習，參加者離開時，會帶走一兩個在日常生活中可以做的動作。",
   "for": "對象",
   "talks_for": ["公司及工作間", "學校", "運動隊及會所", "社區團體及安老院舍"],
   "topics_h": "常見主題",
@@ -533,7 +573,7 @@ XC = {
   "field_exp_h": "經驗",
   "field_exp": ["香港水球隊物理治療師（現任）", "2025 年全國運動會：負責港隊水球的場邊傷患處理及恢復安排",
                 "香港足球會（香港超級聯賽）場邊物理治療師，連續兩季", "拔萃男書院運動隊物理治療支援"],
-  "ask_h": "查詢", "ask_p": "講座和場邊支援的時間、地點及內容，可按需要安排。",
+  "ask_h": "想安排講座或場邊支援？", "ask_p": "告訴我對象、人數、日期和想講的主題，我會建議合適的內容和形式。",
   "more": "了解更多",
   "teaser_talks": "為公司、學校、運動隊及社區團體主持健康講座和工作坊。",
   "teaser_field": "為運動隊及比賽提供場邊物理治療支援。",
@@ -553,7 +593,7 @@ XC = {
   "page_desc": "Registered Physiotherapist Anson Ko gives health talks and workshops and provides on-field physiotherapy support for companies, schools, sports teams and community groups.",
   "page_intro": "Health talks, workshops and on-field physiotherapy support for companies, schools, sports teams and community groups.",
   "talks_h": "Talks and workshops",
-  "talks_p": "I give health talks and workshops for companies, schools, sports teams and community groups. They focus on health education and include demonstrations and simple practice, so people leave with things they can do in daily life.",
+  "talks_p": "I give health talks and workshops for companies, schools, sports teams and community groups. They focus on health education, and every session includes demonstrations and practice, so people leave with one or two moves they can use in daily life.",
   "for": "For",
   "talks_for": ["Companies and workplaces", "Schools", "Sports teams and clubs", "Community groups and care homes"],
   "topics_h": "Common topics",
@@ -573,7 +613,7 @@ XC = {
                 "2025 National Games of China: on-site injury management and recovery for the Hong Kong water polo team",
                 "Field-side physiotherapist, Hong Kong Football Club (Hong Kong Premier League), two consecutive seasons",
                 "Physiotherapy support for Diocesan Boys' School sports teams"],
-  "ask_h": "Enquiries", "ask_p": "Times, venues and content for talks and on-field support can be arranged to suit you.",
+  "ask_h": "Planning a talk or on-field support?", "ask_p": "Tell me who it's for, how many people, the date and the topic you have in mind, and I'll suggest content and a format that fit.",
   "more": "Learn more",
   "teaser_talks": "Health talks and workshops for companies, schools, sports teams and community groups.",
   "teaser_field": "Field-side physiotherapy for sports teams and events.",
@@ -669,7 +709,7 @@ def talks_body(lang):
 <section class="wrap center reveal ask">
   <h2>{G["ask_h"]}</h2>
   <p>{G["ask_p"]}</p>
-  <div class="actions"><a class="pill solid" href="{WA_LINK}">{L["wa"]}</a></div>
+  <div class="actions"><a class="pill solid" href="{L["wa_talks_link"]}">{L["wa"]}</a></div>
 </section>"""
 
 def build_lang(lang, posts, twins):
@@ -696,7 +736,7 @@ def build_lang(lang, posts, twins):
     <h1>{K["h1"]}</h1>
     <p class="role">{L["title"]}</p>
     <p class="lead">{K["lead"]}</p>
-    <div class="actions"><a class="pill solid" href="{WA_LINK}">WhatsApp {WA_NUMBER}</a><a class="pill clear" href="clinic-info.html">{L["clinic"]}</a></div>
+    <div class="actions"><a class="pill solid" href="{L["wa_link"]}">WhatsApp {WA_NUMBER}</a><a class="pill clear" href="clinic-info.html">{L["clinic"]}</a></div>
   </div>
   <figure class="hero-photo"><img src="img/anson.jpg" alt="{K["photo_alt"]}" width="800" height="1000">
     <figcaption class="chip chip-dark">{K["chip"]}</figcaption></figure>
@@ -733,7 +773,7 @@ def build_lang(lang, posts, twins):
 {visit_block(L, lang)}
 
 <section class="wrap reveal">
-  <div class="section-head"><h2>{L["latest"]}</h2><a class="pill line" href="articles.html">{L["all_posts"]}</a></div>
+  <div class="section-head"><div class="sh-text"><h2>{L["latest"]}</h2><p>{L["latest_sub"].format(mins=mins_range(posts))}</p></div><a class="pill line" href="articles.html">{L["all_posts"]}</a></div>
   {post_grid(posts[:3], lang, "")}
 </section>""", "index.html", business(lang))
 
@@ -749,6 +789,8 @@ def build_lang(lang, posts, twins):
     pages["first-visit.html"] = page(lang, "first-visit.html", K["first_h"], K["fv_desc"],
         page_head(K["first_h"], K["first_p"]),
         f"""<div class="wrap"><div class="prose">
+  <h2>{K["fv_ready_h"]}</h2>
+  {K["fv_ready"]}
   <h2>{K["fv_what"]}</h2>
   <ol>{"".join(f"<li>{s}</li>" for s in K["steps"])}</ol>
   <h2>{K["fv_bring"]}</h2>
@@ -757,7 +799,9 @@ def build_lang(lang, posts, twins):
   <p>{K["fee"]}</p>
   <h2>{K["fv_ref"]}</h2>
   <p>{K["referral"]}</p>
-  <div class="actions"><a class="pill solid" href="clinic-info.html">{L["clinic"]}</a></div>
+  <h2>{K["fv_book_h"]}</h2>
+  <p>{K["fv_book"]}</p>
+  <div class="actions"><a class="pill solid" href="{L["wa_link"]}">{L["wa_book"]}</a><a class="pill line" href="clinic-info.html">{L["clinic"]}</a></div>
 </div></div>""", "first-visit.html")
 
     pages["clinic-info.html"] = page(lang, "clinic-info.html", L["clinic"], K["ci_desc"],
@@ -788,7 +832,7 @@ def build_lang(lang, posts, twins):
         page_head(G["page_t"], G["page_intro"]), talks_body(lang), "talks-onfield.html")
 
     pages["articles.html"] = page(lang, "articles.html", L["articles"], K["articles_desc"],
-        page_head(L["articles"], K["articles_intro"]), articles_body(posts, lang), "articles.html")
+        page_head(L["articles"], K["articles_intro"].format(mins=mins_range(posts))), articles_body(posts, lang), "articles.html")
 
     pages["404.html"] = page(lang, "404.html", K["nf_t"], K["nf_t"], page_head(K["nf_t"]),
         f'<div class="wrap"><a class="pill solid" href="index.html">{K["nf_link"]}</a></div>')

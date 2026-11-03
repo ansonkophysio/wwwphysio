@@ -18,7 +18,7 @@
   // A soft ripple where you tap buttons and cards
   if (!reduce) {
     document.addEventListener("pointerdown", (ev) => {
-      const t = ev.target.closest(".pill, .card, .post-card, .featured, .steps li, .filters button, .tcard");
+      const t = ev.target.closest(".pill, .card, .post-card, .featured, .steps li, .filters button, .tcard, .situations a, .next-read");
       if (!t) return;
       const r = t.getBoundingClientRect();
       const s = document.createElement("span");
