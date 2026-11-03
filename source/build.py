@@ -43,7 +43,7 @@ T = {
   "html_lang": "zh-Hant-HK", "og_locale": "zh_HK", "in_lang": "zh-HK",
   "site_name": "高浩維 Anson Ko｜註冊物理治療師", "sep": "｜",
   "brand": "高浩維 Anson Ko", "name_short": "高浩維 Anson Ko", "title": "註冊物理治療師",
-  "nav": [("index.html", "首頁"), ("services.html", "服務範圍"), ("first-visit.html", "首次診症"),
+  "nav": [("index.html", "首頁"), ("services.html", "服務範圍"), ("talks-onfield.html", "講座及場邊支援"), ("first-visit.html", "首次診症"),
           ("clinic-info.html", "診所資料"), ("articles.html", "文章"), ("about.html", "關於我")],
   "nav_label": "主要", "menu": "選單", "switch": "EN", "switch_label": "English version",
   "wa": "WhatsApp 查詢", "map": "Google 地圖", "clinic": "診所資料",
@@ -65,7 +65,7 @@ T = {
   "html_lang": "en-HK", "og_locale": "en_HK", "in_lang": "en-HK",
   "site_name": "Anson Ko | Registered Physiotherapist", "sep": " | ",
   "brand": "Anson Ko 高浩維", "name_short": "Anson Ko 高浩維", "title": "Registered Physiotherapist",
-  "nav": [("index.html", "Home"), ("services.html", "Services"), ("first-visit.html", "First visit"),
+  "nav": [("index.html", "Home"), ("services.html", "Services"), ("talks-onfield.html", "Talks & on-field"), ("first-visit.html", "First visit"),
           ("clinic-info.html", "Clinic info"), ("articles.html", "Articles"), ("about.html", "About")],
   "nav_label": "Main", "menu": "Menu", "switch": "中文", "switch_label": "中文版",
   "wa": "WhatsApp", "map": "Google Maps", "clinic": "Clinic info",
@@ -374,17 +374,17 @@ def articles_body(posts, lang):
 
 C = {
  "zh": {
-  "home_desc": "高浩維 Anson Ko，香港註冊物理治療師，於尖沙咀 Amazing Medical 應診。服務包括肩頸腰背痛、運動創傷及手術後復康，並以廣東話簡單講解痛症知識。",
+  "home_desc": "高浩維 Anson Ko，香港註冊物理治療師，於尖沙咀 Amazing Medical 應診。服務包括肩頸腰背痛、運動創傷及手術後復康。",
   "h1": '<span class="n1">高浩維</span><span class="n2">Anson Ko</span>',
   "lead": "於尖沙咀 Amazing Medical 應診，服務包括肩頸腰背痛、運動創傷及手術後復康。",
   "photo_alt": "註冊物理治療師高浩維 Anson Ko", "chip": "尖沙咀麼地道　德拓大廈 4 樓",
-  "intro_h": "用廣東話，簡單講解<br>痛症和運動創傷",
+  "intro_h": "從評估開始，<br>按你的情況訂定計劃",
   "intro_p": "物理治療透過評估、運動訓練、手法治療及其他物理治療方法，幫助改善痛楚和活動能力。",
   "cards": [("肩頸、腰背及關節痛", "例如長時間坐著工作引起的痛楚、膝關節退化。", "治療室"),
             ("運動創傷", "例如扭傷、拉傷、行山或跑步後的膝蓋痛。", "運動訓練區"),
             ("手術後復康", "例如膝關節或髖關節置換手術後，以及韌帶手術後的康復訓練。", "")],
   "panel": ("45–60", "分鐘首次診症"),
-  "statement": "我會先評估你的痛楚和活動能力，再用廣東話解釋原因，<span class=\"dim\">然後和你一起訂定運動及治療計劃。</span>",
+  "statement": "我會先評估你的痛楚和活動能力，再解釋原因，<span class=\"dim\">然後和你一起訂定運動及治療計劃。</span>",
   "stats": [("45–60<small>分鐘</small>", "首次診症", "了解病歷、進行檢查，並解釋評估結果及治療計劃。"),
             ("HK$900", "物理治療每節", "每節 45–60 分鐘。其他治療項目收費，歡迎 WhatsApp 查詢。"),
             ("5<small>天</small>", "每週應診", "星期二至六應診；星期日、一及公眾假期休息。")],
@@ -437,14 +437,14 @@ C = {
       <li>Certified Kinesio Taping Practitioner</li>
     </ul>
     <p>診症語言：廣東話、英語</p>""",
-  "ig_line": '我亦會在 <a href="{ig}">Instagram</a> 以廣東話分享痛症和運動知識。',
+  "ig_line": '我亦會在 <a href="{ig}">Instagram</a> 分享痛症和運動知識。',
  },
  "en": {
   "home_desc": "Anson Ko is a Registered Physiotherapist in Hong Kong, seeing patients at Amazing Medical, Tsim Sha Tsui. Services include neck, back and joint pain, sports injuries and rehabilitation after surgery.",
   "h1": '<span class="n1">Anson Ko</span><span class="n2">高浩維</span>',
   "lead": "Seeing patients at Amazing Medical, Tsim Sha Tsui. Services include neck, back and joint pain, sports injuries and rehabilitation after surgery.",
   "photo_alt": "Registered Physiotherapist Anson Ko", "chip": "4/F, Yes & Right House, Mody Road",
-  "intro_h": "Pain and sports injuries,<br>explained simply",
+  "intro_h": "It starts with an assessment,<br>and a plan that fits you",
   "intro_p": "Physiotherapy uses assessment, exercise training, manual therapy and other physiotherapy methods to help improve pain and movement.",
   "cards": [("Neck, back and joint pain", "For example, pain from long hours sitting at work, or knee osteoarthritis.", "Treatment room"),
             ("Sports injuries", "For example, sprains, strains, and knee pain after hiking or running.", "Exercise area"),
@@ -503,9 +503,130 @@ C = {
       <li>Certified Kinesio Taping Practitioner</li>
     </ul>
     <p>Languages: Cantonese and English</p>""",
-  "ig_line": 'I also share pain and exercise tips in Cantonese on <a href="{ig}">Instagram</a>.',
+  "ig_line": 'I also share pain and exercise tips on <a href="{ig}">Instagram</a>.',
  },
 }
+
+
+# ---------- talks, on-field support and the clinic gallery ----------
+
+XC = {
+ "zh": {
+  "page_t": "講座及場邊支援",
+  "page_desc": "註冊物理治療師高浩維 Anson Ko 為公司、學校、運動隊及社區團體提供健康講座、工作坊及場邊物理治療支援。",
+  "page_intro": "為公司、學校、運動隊及社區團體提供健康講座、工作坊及場邊物理治療支援。",
+  "talks_h": "講座及工作坊",
+  "talks_p": "我為公司、學校、運動隊及社區團體主持健康講座和工作坊。內容以健康教育為主，並包括示範和簡單練習，讓參加者帶走在日常生活中可以做的事。",
+  "for": "對象",
+  "talks_for": ["公司及工作間", "學校", "運動隊及會所", "社區團體及安老院舍"],
+  "topics_h": "常見主題",
+  "topics": ["痛症與日常運動", "辦公室肩頸腰背痛", "跑步、行山及球類運動的創傷預防", "比賽前準備：睡眠、熱身及恢復", "長者肌力及預防跌倒"],
+  "recent_h": "最近的講座",
+  "recent": [("2026 年 10 月", "長者痛症與運動工作坊（社區機構，一小時，包括示範及練習）"),
+             ("2026 年 10 月", "比賽週準備講座（中學游泳隊）")],
+  "field_h": "場邊支援",
+  "field_p": "我為運動隊及比賽提供場邊物理治療支援，在訓練和比賽期間處理傷患，並與教練及隊伍的醫療人員合作。",
+  "field_for": ["運動隊", "學校運動隊", "比賽及運動活動"],
+  "field_what_h": "內容",
+  "field_what": ["場邊傷患評估及即時處理", "貼紮及比賽前準備", "賽後恢復安排", "評估能否繼續比賽，以及重返訓練的安排"],
+  "field_exp_h": "經驗",
+  "field_exp": ["香港水球隊物理治療師（現任）", "2025 年全國運動會：負責港隊水球的場邊傷患處理及恢復安排",
+                "香港足球會（香港超級聯賽）場邊物理治療師，連續兩季", "拔萃男書院運動隊物理治療支援"],
+  "ask_h": "查詢", "ask_p": "講座和場邊支援的時間、地點及內容，可按需要安排。",
+  "more": "了解更多",
+  "teaser_talks": "為公司、學校、運動隊及社區團體主持健康講座和工作坊。",
+  "teaser_field": "為運動隊及比賽提供場邊物理治療支援。",
+  "talk_alt": "物理治療師在屏幕前講解，台下有觀眾", "field_alt": "物理治療師在泳池邊為運動員處理膝部",
+  "gallery_h": "診所環境",
+  "gallery": [("img/waiting-area.jpg", "候診區"), ("img/treatment-room.jpg", "治療室"),
+              ("img/equipment.jpg", "治療儀器"), ("img/gym-area.jpg", "運動訓練區")],
+ },
+ "en": {
+  "page_t": "Talks & on-field support",
+  "page_desc": "Registered Physiotherapist Anson Ko gives health talks and workshops and provides on-field physiotherapy support for companies, schools, sports teams and community groups.",
+  "page_intro": "Health talks, workshops and on-field physiotherapy support for companies, schools, sports teams and community groups.",
+  "talks_h": "Talks and workshops",
+  "talks_p": "I give health talks and workshops for companies, schools, sports teams and community groups. They focus on health education and include demonstrations and simple practice, so people leave with things they can do in daily life.",
+  "for": "For",
+  "talks_for": ["Companies and workplaces", "Schools", "Sports teams and clubs", "Community groups and care homes"],
+  "topics_h": "Common topics",
+  "topics": ["Pain and everyday exercise", "Neck, shoulder and back pain at the office", "Injury prevention for running, hiking and ball sports",
+             "Competition preparation: sleep, warm-up and recovery", "Strength and fall prevention for older adults"],
+  "recent_h": "Recent talks",
+  "recent": [("October 2026", "Pain and exercise workshop for older adults (community organisation; one hour, with demonstrations and practice)"),
+             ("October 2026", "Race-week preparation talk (secondary school swim team)")],
+  "field_h": "On-field support",
+  "field_p": "I provide field-side physiotherapy for sports teams and events, managing injuries during training and competition and working with coaches and the team's medical staff.",
+  "field_for": ["Sports teams", "School teams", "Competitions and sports events"],
+  "field_what_h": "What's included",
+  "field_what": ["Field-side injury assessment and immediate care", "Taping and pre-competition preparation", "Post-match recovery",
+                 "Deciding whether an athlete can continue, and planning the return to training"],
+  "field_exp_h": "Experience",
+  "field_exp": ["Team Physiotherapist, Hong Kong Water Polo Team (current)",
+                "2025 National Games of China: on-site injury management and recovery for the Hong Kong water polo team",
+                "Field-side physiotherapist, Hong Kong Football Club (Hong Kong Premier League), two consecutive seasons",
+                "Physiotherapy support for Diocesan Boys' School sports teams"],
+  "ask_h": "Enquiries", "ask_p": "Times, venues and content for talks and on-field support can be arranged to suit you.",
+  "more": "Learn more",
+  "teaser_talks": "Health talks and workshops for companies, schools, sports teams and community groups.",
+  "teaser_field": "Field-side physiotherapy for sports teams and events.",
+  "talk_alt": "A physiotherapist presenting in front of a screen to an audience", "field_alt": "A physiotherapist treating an athlete's knee by the pool",
+  "gallery_h": "The clinic",
+  "gallery": [("img/waiting-area.jpg", "Waiting area"), ("img/treatment-room.jpg", "Treatment room"),
+              ("img/equipment.jpg", "Treatment equipment"), ("img/gym-area.jpg", "Exercise area")],
+ },
+}
+
+def gallery(lang):
+    G = XC[lang]
+    figs = "".join(f'<figure class="b{i + 1}"><img src="{src}" alt="{cap}" loading="lazy"><figcaption class="chip chip-dark">{cap}</figcaption></figure>'
+                   for i, (src, cap) in enumerate(G["gallery"]))
+    return f'<section class="wrap reveal"><h2>{G["gallery_h"]}</h2><div class="bento stagger">{figs}</div></section>'
+
+def teaser(lang):
+    G = XC[lang]
+    return f"""<section class="wrap reveal">
+  <div class="section-head"><h2>{G["page_t"]}</h2><a class="pill line" href="talks-onfield.html">{G["more"]}</a></div>
+  <div class="teaser-grid stagger">
+    <a class="tcard" href="talks-onfield.html#talks"><img src="img/covers/talks.svg" alt="" loading="lazy"><div><h3>{G["talks_h"]}</h3><p>{G["teaser_talks"]}</p></div></a>
+    <a class="tcard" href="talks-onfield.html#onfield"><img src="img/covers/onfield.svg" alt="" loading="lazy"><div><h3>{G["field_h"]}</h3><p>{G["teaser_field"]}</p></div></a>
+  </div>
+</section>"""
+
+def talks_body(lang):
+    G, L = XC[lang], T[lang]
+    chips = lambda items: "".join(f'<span class="chip-topic">{x}</span>' for x in items)
+    li = lambda items: "".join(f"<li>{x}</li>" for x in items)
+    recent = "".join(f'<li><time>{d}</time><span>{x}</span></li>' for d, x in G["recent"])
+    return f"""<section class="wrap feature reveal" id="talks">
+  <figure><img src="img/covers/talks.svg" alt="{G["talk_alt"]}"></figure>
+  <div class="feature-text">
+    <h2>{G["talks_h"]}</h2>
+    <p>{G["talks_p"]}</p>
+    <div class="chips" aria-label="{G["for"]}">{chips(G["talks_for"])}</div>
+    <h3>{G["topics_h"]}</h3>
+    <ul class="ticks">{li(G["topics"])}</ul>
+    <h3>{G["recent_h"]}</h3>
+    <ul class="dated">{recent}</ul>
+  </div>
+</section>
+<section class="wrap feature reverse reveal" id="onfield">
+  <figure><img src="img/covers/onfield.svg" alt="{G["field_alt"]}"></figure>
+  <div class="feature-text">
+    <h2>{G["field_h"]}</h2>
+    <p>{G["field_p"]}</p>
+    <div class="chips" aria-label="{G["for"]}">{chips(G["field_for"])}</div>
+    <h3>{G["field_what_h"]}</h3>
+    <ul class="ticks">{li(G["field_what"])}</ul>
+    <h3>{G["field_exp_h"]}</h3>
+    <ul class="ticks">{li(G["field_exp"])}</ul>
+  </div>
+</section>
+<section class="wrap center reveal ask">
+  <h2>{G["ask_h"]}</h2>
+  <p>{G["ask_p"]}</p>
+  <div class="actions"><a class="pill solid" href="{WA_LINK}">{L["wa"]}</a></div>
+</section>"""
 
 def build_lang(lang, posts, twins):
     L, K = T[lang], C[lang]
@@ -561,6 +682,10 @@ def build_lang(lang, posts, twins):
   </div>
 </section>
 
+{teaser(lang)}
+
+{gallery(lang)}
+
 {visit_block(L, lang)}
 
 <section class="wrap reveal">
@@ -594,6 +719,7 @@ def build_lang(lang, posts, twins):
     pages["clinic-info.html"] = page(lang, "clinic-info.html", L["clinic"], K["ci_desc"],
         page_head(L["clinic"], L["by_appt"] + ("。" if lang == "zh" else ".")),
         f"""{visit_block(L, lang, both_addresses=True)}
+{gallery(lang)}
 <div class="wrap"><div class="prose">
   <h2>{K["fv_ref"]}</h2>
   <p>{K["referral"]}</p>
@@ -611,6 +737,10 @@ def build_lang(lang, posts, twins):
     <div class="actions"><a class="pill solid" href="clinic-info.html">{L["clinic"]}</a><a class="pill line" href="first-visit.html">{K["first_visit_link"]}</a></div>
   </div>
 </div>""", "about.html")
+
+    G = XC[lang]
+    pages["talks-onfield.html"] = page(lang, "talks-onfield.html", G["page_t"], G["page_desc"],
+        page_head(G["page_t"], G["page_intro"]), talks_body(lang), "talks-onfield.html")
 
     pages["articles.html"] = page(lang, "articles.html", L["articles"], K["articles_desc"],
         page_head(L["articles"], K["articles_intro"]), articles_body(posts, lang), "articles.html")
