@@ -420,6 +420,7 @@ section { display: grid; gap: 1.75rem; }
 .post-card .thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 1s var(--ease); }
 .post-card:hover .thumb img { transform: scale(1.05); }
 .post-card .body { padding: 1.2rem 1.25rem 1.35rem; display: grid; gap: 0.7rem; align-content: start; }
+.post-card .chip-topic { justify-self: start; }
 .post-card h3 { font-size: 1.15rem; font-weight: 500; line-height: 1.5; }
 .post-card h3 a { color: var(--ink); text-decoration: none; }
 .post-card h3 a::after { content: ""; position: absolute; inset: 0; z-index: 1; }

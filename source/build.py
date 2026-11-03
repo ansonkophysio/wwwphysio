@@ -258,7 +258,7 @@ def load_posts(folder):
         m = re.match(r"\s*<!--(.*?)-->(.*)", raw, re.S)
         meta = json.loads(m.group(1)); meta["body"] = m.group(2).strip()
         posts.append(meta)
-    return sorted(posts, key=lambda x: x["date"], reverse=True)
+    return sorted(posts, key=lambda x: (x["date"], x.get("time", "00:00")), reverse=True)
 
 MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August",
           "September", "October", "November", "December"]
