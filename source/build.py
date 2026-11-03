@@ -656,7 +656,7 @@ def build():
         open(os.path.join(OUT, "sitemap.xml"), "w").write(
             f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{sm}</urlset>')
         open(os.path.join(OUT, "robots.txt"), "w").write(f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}/sitemap.xml\n")
-        open(os.path.join(OUT, "CNAME"), "w").write("www.wwwphysio.com\n")
+        open(os.path.join(OUT, "CNAME"), "w").write("www.wwwphysio.com")
         open(os.path.join(OUT, ".nojekyll"), "w").write("")
     n_todo = sum(open(os.path.join(OUT, u), encoding="utf-8").read().count('class="todo"') for u in written)
     print(f"Built {len(written)} pages into {OUT}. Facts still to confirm: {n_todo}")
