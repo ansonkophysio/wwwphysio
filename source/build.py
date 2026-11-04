@@ -23,7 +23,7 @@ MAP_LINK = "https://maps.app.goo.gl/wyFuP1kzYqcNsBYn6"
 ADDRESS_ZH = "九龍尖沙咀麼地道 1–3 號德拓大廈 4 樓全層（Amazing Medical）"
 ADDRESS_EN = "4/F, Yes & Right House, 1–3 Mody Road, Tsim Sha Tsui, Kowloon (Amazing Medical)"
 INSTAGRAM = "https://www.instagram.com/ansonko_physio/"
-FACEBOOK = "https://www.facebook.com/Ansonkophysio"
+FACEBOOK = ""  # Anson's Facebook page address: paste it here (the old guess was wrong); the footer link appears only when set
 
 def asset_version(name):
     return hashlib.sha1(open(os.path.join(ROOT, "src", name), "rb").read()).hexdigest()[:8]
@@ -148,7 +148,7 @@ def footer(L, lp=""):
     <div><h2>{L["hours_title"]}</h2>{hours_dl(L)}</div>
     <div><h2>{L["address"]}</h2><p>{L["address_line"]}</p><p><a href="{lp}clinic-info.html">{L["clinic"]}</a>　<a href="{MAP_LINK}">{L["map"]}</a></p></div>
     <div><h2>{L["contact"]}</h2><p>WhatsApp: <a href="{L["wa_link"]}">{WA_NUMBER}</a></p>
-      <p><a href="{INSTAGRAM}">Instagram</a>　<a href="{FACEBOOK}">Facebook</a></p></div>
+      <p><a href="{INSTAGRAM}">Instagram</a>{f'　<a href="{FACEBOOK}">Facebook</a>' if FACEBOOK else ""}</p></div>
   </div>
   <div class="fine"><span>{L["fine"]}</span><span>© {date.today().year} 高浩維 Anson Ko</span></div>
   <div class="wordmark" aria-hidden="true">Anson Ko</div>
