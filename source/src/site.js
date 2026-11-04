@@ -18,7 +18,7 @@
   // A soft ripple where you tap buttons and cards
   if (!reduce) {
     document.addEventListener("pointerdown", (ev) => {
-      const t = ev.target.closest(".pill, .card, .post-card, .featured, .steps li, .filters button, .tcard, .next-read");
+      const t = ev.target.closest(".pill, .card, .post-card, .featured, .steps li, .filters button, .tcard, .next-read, .topic-links a");
       if (!t) return;
       const r = t.getBoundingClientRect();
       const s = document.createElement("span");
@@ -99,9 +99,12 @@
       if (!btn) return;
       const topic = btn.dataset.filter;
       group.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
-      document.querySelectorAll(".post-grid li").forEach((li) => {
+      document.querySelectorAll(".post-grid li, .featured-wrap").forEach((li) => {
         li.hidden = Boolean(topic) && li.dataset.topic !== topic;
       });
     });
+    // Arriving from a topic link on the home page (articles.html#knee): show that topic
+    const pick = location.hash.slice(1) && group.querySelector(`button[data-id="${CSS.escape(location.hash.slice(1))}"]`);
+    if (pick) pick.click();
   }
 })();

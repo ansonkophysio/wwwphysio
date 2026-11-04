@@ -47,8 +47,8 @@ T = {
   "html_lang": "zh-Hant-HK", "og_locale": "zh_HK", "in_lang": "zh-HK",
   "site_name": "高浩維 Anson Ko｜註冊物理治療師", "sep": "｜",
   "brand": "高浩維 Anson Ko", "name_short": "高浩維 Anson Ko", "title": "註冊物理治療師",
-  "nav": [("index.html", "首頁"), ("services.html", "服務範圍"), ("talks-onfield.html", "講座及場邊支援"), ("first-visit.html", "首次診症"),
-          ("clinic-info.html", "診所資料"), ("articles.html", "文章"), ("about.html", "關於我")],
+  "nav": [("articles.html", "文章"), ("about.html", "關於我"), ("talks-onfield.html", "講座及場邊支援"), ("services.html", "服務範圍"),
+          ("first-visit.html", "首次診症"), ("clinic-info.html", "診所資料")],
   "nav_label": "主要", "menu": "選單", "switch": "EN", "switch_label": "English version",
   "wa": "WhatsApp 查詢", "map": "Google 地圖", "clinic": "診所資料",
   "wa_link": wa("你好，我想查詢物理治療"), "wa_talks_link": wa("你好，我想查詢講座或場邊支援"),
@@ -71,8 +71,8 @@ T = {
   "html_lang": "en-HK", "og_locale": "en_HK", "in_lang": "en-HK",
   "site_name": "Anson Ko | Registered Physiotherapist", "sep": " | ",
   "brand": "Anson Ko 高浩維", "name_short": "Anson Ko 高浩維", "title": "Registered Physiotherapist",
-  "nav": [("index.html", "Home"), ("services.html", "Services"), ("talks-onfield.html", "Talks & on-field"), ("first-visit.html", "First visit"),
-          ("clinic-info.html", "Clinic info"), ("articles.html", "Articles"), ("about.html", "About")],
+  "nav": [("articles.html", "Articles"), ("about.html", "About"), ("talks-onfield.html", "Talks & on-field"), ("services.html", "Services"),
+          ("first-visit.html", "First visit"), ("clinic-info.html", "Clinic info")],
   "nav_label": "Main", "menu": "Menu", "switch": "中文", "switch_label": "中文版",
   "wa": "WhatsApp", "map": "Google Maps", "clinic": "Clinic info",
   "wa_link": wa("Hi, I'd like to ask about physiotherapy"), "wa_talks_link": wa("Hi, I'd like to ask about a talk or on-field support"),
@@ -82,7 +82,7 @@ T = {
   "address": "Address", "contact": "Contact", "lift": "Take the lift to 4/F and ring the doorbell.",
   "reception": "Amazing Medical reception",
   "fine": "The information on this website is for general reference only and does not replace professional diagnosis or treatment.",
-  "latest": "Latest articles", "all_posts": "All articles", "more_posts": "More articles", "posts_soon": "Articles coming soon.",
+  "latest": "Latest article", "all_posts": "All articles", "more_posts": "More articles", "posts_soon": "Articles coming soon.",
   "next_read": "Read next",
   "filter_all": "All", "filter_label": "Filter by topic",
   "read_min": "{n} min read", "crumbs": "Breadcrumb", "articles": "Articles", "toc": "In this article",
@@ -102,21 +102,6 @@ def hours_dl(L):
 </dl>"""
 
 # ---------- shared parts ----------
-
-def segs(open_idx):
-    cells = "".join(f'<i class="on" style="--i:{n}"></i>' if n in open_idx else "<i></i>" for n in range(7))
-    return f'<div class="segs" aria-hidden="true">{cells}</div>'
-
-def hours_card(L):
-    days = "".join(f"<span>{d}</span>" for d in L["days"])
-    return f"""<aside class="hours-card glass" aria-label="{L["hours_title"]}">
-  <h2>{L["hours_title"]}</h2>
-  <div class="meter"><div class="meter-top"><span>{L["tue_fri"]}</span><span>10:00–19:00</span></div>{segs({1, 2, 3, 4})}
-    <div class="seg-days" aria-hidden="true">{days}</div></div>
-  <div class="meter"><div class="meter-top"><span>{L["sat"]}</span><span>09:30–14:00</span></div>{segs({5})}</div>
-  <div class="meter"><div class="meter-top"><span>{L["sun_mon"]}</span><span>{L["closed"]}</span></div>{segs(set())}</div>
-  <p class="note">{L["hours_note"]}</p>
-</aside>"""
 
 def visit_block(L, lang, both_addresses=False):
     extra = ""
@@ -148,7 +133,6 @@ def header(L, lang, active, lp, switch_href):
   <a class="brand" href="{lp}index.html">{L["brand"]}</a>
   <nav class="nav nav-wide" aria-label="{L["nav_label"]}">{links}</nav>
   {sw}
-  <a class="pill solid" href="{L["wa_link"]}">{L["wa"]}</a>
   <details class="menu"><summary>{L["menu"]}</summary><nav class="nav" aria-label="{L["nav_label"]}">{links}<a href="{switch_href}" lang="{T[other]["html_lang"]}">{L["switch_label"]}</a></nav></details>
 </div></div></header>"""
 
@@ -156,13 +140,13 @@ def page_head(title, intro="", extra_class=""):
     intro_html = f"<p>{intro}</p>" if intro else ""
     return f'<div class="wrap page-head {extra_class}"><h1>{title}</h1>{intro_html}</div>'
 
-def footer(L):
+def footer(L, lp=""):
     return f"""<footer class="site-footer">
 <div class="wrap">
   <div class="cols">
     <div class="lead-col"><p>{L["name_short"]}<br>{L["title"]}</p></div>
     <div><h2>{L["hours_title"]}</h2>{hours_dl(L)}</div>
-    <div><h2>{L["address"]}</h2><p>{L["address_line"]}</p><p><a href="{MAP_LINK}">{L["map"]}</a></p></div>
+    <div><h2>{L["address"]}</h2><p>{L["address_line"]}</p><p><a href="{lp}clinic-info.html">{L["clinic"]}</a>　<a href="{MAP_LINK}">{L["map"]}</a></p></div>
     <div><h2>{L["contact"]}</h2><p>WhatsApp: <a href="{L["wa_link"]}">{WA_NUMBER}</a></p>
       <p><a href="{INSTAGRAM}">Instagram</a>　<a href="{FACEBOOK}">Facebook</a></p></div>
   </div>
@@ -235,7 +219,7 @@ def page(lang, path, title, desc, band, body, active=None, ld=None, og_type="web
         band = band.replace(f'{attr}="img/', f'{attr}="{ap}img/')
     mist_class = "mist" if path == "index.html" else "mist sub"
     content = (f'<div class="{mist_class}">\n{header(L, lang, active, lp, switch_href)}\n{band}\n</div>\n'
-               f"<main>\n{body}\n</main>\n{footer(L)}")
+               f"<main>\n{body}\n</main>\n{footer(L, lp)}")
     if PREVIEW and full == "index.html":
         # Artifact pages are wrapped in their own skeleton: no doctype/html/head/body here.
         first, rest = head_bits.split("\n", 1)
@@ -285,6 +269,31 @@ def reading_minutes(body):
 def mins_range(posts):
     m = sorted(reading_minutes(x["body"]) for x in posts) or [3]
     return str(m[0]) if m[0] == m[-1] else f"{m[0]}–{m[-1]}"
+
+TOPIC_IDS = {"肩頸痛": "neck", "腰痛": "back", "膝痛": "knee", "運動創傷": "sports",
+             "Neck & shoulders": "neck", "Low back pain": "back", "Knee pain": "knee", "Sports injuries": "sports"}
+
+def topic_id(t):
+    return TOPIC_IDS.get(t) or re.sub(r"[^a-z0-9]+", "-", t.lower()).strip("-") or "topic"
+
+def topics_of(posts):
+    out = []
+    for x in posts:
+        if x.get("topic") and x["topic"] not in out:
+            out.append(x["topic"])
+    return out
+
+def hero_post(x, lang):
+    L = T[lang]
+    return f"""<article class="hero-post glass">
+    <div class="thumb"><img src="{cover_of(x)}" alt="{x.get("cover_alt", "")}"></div>
+    <div class="body">
+      <div class="hp-top"><span class="label">{L["latest"]}</span><span class="chip-topic">{x.get("topic", "")}</span></div>
+      <h2><a href="articles/{x["slug"]}.html">{x["title"]}</a></h2>
+      <p class="ex">{x["description"]}</p>
+      {meta_row(x, lang)}
+    </div>
+  </article>"""
 
 def cover_of(x):
     return x.get("cover") or "img/covers/default.svg"
@@ -384,27 +393,26 @@ def articles_body(posts, lang):
     filters = ""
     if len(topics) > 1 and rest:
         btns = f'<button type="button" aria-pressed="true" data-filter="">{L["filter_all"]}</button>' + "".join(
-            f'<button type="button" aria-pressed="false" data-filter="{t}">{t}</button>' for t in topics)
+            f'<button type="button" aria-pressed="false" data-filter="{t}" data-id="{topic_id(t)}">{t}</button>' for t in topics)
         filters = f'<div class="filters" role="group" aria-label="{L["filter_label"]}">{btns}</div>'
     grid = (f'<section class="wrap reveal"><div class="section-head"><h2>{L["all_posts"]}</h2>{filters}</div>{post_grid(rest, lang, "")}</section>'
             if rest else "")
-    return f'<div class="wrap reveal">{featured_card(posts[0], lang)}</div>\n{grid}'
+    return f'<div class="wrap reveal featured-wrap" data-topic="{posts[0].get("topic", "")}">{featured_card(posts[0], lang)}</div>\n{grid}'
 
 # ---------- page content, per language ----------
 
 C = {
  "zh": {
-  "home_desc": "高浩維 Anson Ko，香港註冊物理治療師，於尖沙咀 Amazing Medical 應診。服務範圍包括肩頸及腰背痛、運動創傷及手術後復康。",
-  "h1": '<span class="n1">高浩維</span><span class="n2">Anson Ko</span>',
-  "lead": "於尖沙咀 Amazing Medical 應診。服務範圍包括肩頸及腰背痛、運動創傷，以及手術後復康。",
-  "photo_alt": "註冊物理治療師高浩維 Anson Ko", "chip": "尖沙咀麼地道　德拓大廈 4 樓",
-  "intro_h": "先了解成因，<br>再訂定合適的計劃",
+  "home_desc": "以淺白文字講解常見痛症及運動創傷，並附可在家進行的練習。由香港註冊物理治療師高浩維 Anson Ko 撰寫，於尖沙咀 Amazing Medical 應診。",
+  "author_p": "<b>高浩維 Anson Ko</b>，香港註冊物理治療師，於尖沙咀 Amazing Medical 應診。前香港水球隊運動員（2017–2024），現任香港水球隊物理治療師。",
+  "author_h": "關於作者",
+  "topics_label": "按主題瀏覽",
+  "blog_lead": "以淺白文字講解常見痛症及運動創傷，並附可在家進行的練習。",
+  "blog_h1": "了解痛症與運動創傷",
+  "photo_alt": "註冊物理治療師高浩維 Anson Ko",
   "intro_p": "物理治療以評估為基礎，透過運動治療、手法治療等方法，幫助改善痛楚及活動能力。",
-  "cards": [["肩頸、腰背及關節痛", "例如久坐引起的肩頸及腰背痛、手腕及手肘痛，以及膝關節退化。", "治療室"], ["運動創傷", "例如扭傷、拉傷，以及跑步或行山後出現的膝痛。", "運動訓練區"], ["手術後復康", "例如膝關節或髖關節置換、韌帶手術後的康復訓練。", ""]],
-  "panel": ("45–60", "分鐘首次診症"),
-  "statement": "我會先評估你的痛楚及活動能力，以淺白的方式解釋成因，<span class=\"dim\">再與你一同訂定運動及治療計劃。</span>",
   "stats": [["45–60<small>分鐘</small>", "首次診症", "包括問診、檢查，以及講解評估結果與治療計劃。"], ["HK$900", "每節物理治療", "每節 45–60 分鐘。其他治療項目的收費，歡迎以 WhatsApp 查詢。"], ["5<small>天</small>", "每週應診", "星期二至六應診；星期日、一及公眾假期休息。"]],
-  "first_h": "首次診症", "first_p": "首次診症約需 45–60 分鐘。", "step_sep": "：",
+  "first_h": "首次診症", "first_p": "首次診症約需 45–60 分鐘。",
   "steps": [["問診", "了解病歷、症狀及康復目標"], ["評估", "檢查關節活動、肌力及日常動作"], ["講解", "說明評估結果及治療方案"], ["治療", "按需要開始治療，並指導家居練習"]],
   "faq_h": "常見問題",
   "referral": "預約前，可先以 WhatsApp 查詢你的情況是否需要醫生轉介信。如已備有轉介信、診斷書或相關報告，請於首次診症時一併帶來。",
@@ -421,7 +429,7 @@ C = {
   "limits": "治療效果因人而異。評估後，我會說明治療計劃、預計所需時間及治療的限制；如你的情況需要先由醫生跟進，我會直接告知。如症狀持續或出現警號，請諮詢醫生或物理治療師。",
   "first_visit_link": "首次診症須知",
   "fv_desc": "首次物理治療診症約 45–60 分鐘：了解病歷、檢查、解釋評估結果及治療計劃。請帶備轉介信或報告（如有）。收費每節 HK$900。",
-  "fv_what": "診症內容", "fv_bring": "請帶備", "fv_fee": "收費", "fv_ref": "需要醫生轉介信嗎？",
+  "fv_ref": "需要醫生轉介信嗎？",
   "ci_desc": "應診時間、地址及交通：九龍尖沙咀麼地道 1–3 號德拓大廈 4 樓全層（Amazing Medical）。WhatsApp 5592 9407。",
   "ci_family_h": "給家人的資料",
   "ci_family": "<p>如為父母或家人查詢或預約，可直接以 WhatsApp 聯絡，並提供以下資料：</p><ul><li>家人的大致情況（例如疼痛部位、是否剛接受手術）</li><li>方便的時間</li></ul><p>如家人行動不便或需使用輪椅，請預先告知，以便安排。</p>",
@@ -456,17 +464,16 @@ C = {
   "ig_line": '我亦會於 <a href="{ig}">Instagram</a> 分享痛症及運動相關的健康知識。',
  },
  "en": {
-  "home_desc": "Anson Ko is a Registered Physiotherapist in Hong Kong, seeing patients at Amazing Medical, Tsim Sha Tsui. Services include neck, back and joint pain, sports injuries, and rehabilitation after surgery.",
-  "h1": '<span class="n1">Anson Ko</span><span class="n2">高浩維</span>',
-  "lead": "Seeing patients at Amazing Medical, Tsim Sha Tsui. Services include neck, back and joint pain, sports injuries, and rehabilitation after surgery.",
-  "photo_alt": "Registered Physiotherapist Anson Ko", "chip": "4/F, Yes & Right House, Mody Road",
-  "intro_h": "Understand the cause first,<br>then agree on a plan",
+  "home_desc": "Common pain and sports injuries explained in plain language, with exercises you can do at home. Written by Anson Ko, a Registered Physiotherapist in Hong Kong who sees patients at Amazing Medical, Tsim Sha Tsui.",
+  "author_p": "<b>Anson Ko</b> is a Registered Physiotherapist in Hong Kong, seeing patients at Amazing Medical, Tsim Sha Tsui. He played for the Hong Kong Water Polo Team from 2017 to 2024 and is now the team's physiotherapist.",
+  "author_h": "About the author",
+  "topics_label": "Browse by topic",
+  "blog_lead": "Common pain and sports injuries explained in plain language, with exercises you can do at home.",
+  "blog_h1": "Understanding pain and sports injuries",
+  "photo_alt": "Registered Physiotherapist Anson Ko",
   "intro_p": "Physiotherapy starts with an assessment, then uses exercise therapy, manual therapy and other methods to help improve pain and movement.",
-  "cards": [["Neck, back and joint pain", "Such as neck and back pain from long hours of sitting, wrist and elbow pain, and knee osteoarthritis.", "Treatment room"], ["Sports injuries", "Such as sprains, strains, and knee pain after running or hiking.", "Exercise area"], ["Rehab after surgery", "Rehabilitation after a knee or hip replacement, or ligament surgery.", ""]],
-  "panel": ("45–60", "minutes, first visit"),
-  "statement": "I start by assessing your pain and movement and explaining the cause in plain terms, <span class=\"dim\">then we agree on an exercise and treatment plan together.</span>",
   "stats": [["45–60<small>min</small>", "First visit", "History, examination, and an explanation of the findings and treatment plan."], ["HK$900", "Per physiotherapy session", "Each session is 45–60 minutes. For other treatment fees, please ask on WhatsApp."], ["5<small>days</small>", "Open each week", "Tuesday to Saturday. Closed on Sunday, Monday and public holidays."]],
-  "first_h": "Your first visit", "first_p": "A first visit takes about 45–60 minutes.", "step_sep": ": ",
+  "first_h": "Your first visit", "first_p": "A first visit takes about 45–60 minutes.",
   "steps": [["Consultation", "Your history, symptoms and goals"], ["Assessment", "Joint movement, strength and everyday movements"], ["Explanation", "Your findings and treatment plan, in plain terms"], ["Treatment", "Treatment as needed, with exercises for home"]],
   "faq_h": "Common questions",
   "referral": "Before booking, you can ask on WhatsApp whether your situation needs a doctor's referral letter. If you already have a referral letter, medical certificate or reports, please bring them to your first visit.",
@@ -483,7 +490,7 @@ C = {
   "limits": "Results vary from person to person. After the assessment, I'll explain the treatment plan, the likely time frame and its limits; if you need to see a doctor first, I'll tell you directly. If symptoms persist or warning signs appear, please see a doctor or physiotherapist.",
   "first_visit_link": "Your first visit",
   "fv_desc": "A first physiotherapy visit takes about 45–60 minutes: your history, an examination, and an explanation of the findings and treatment plan. Please bring any referral letter or reports. HK$900 per session.",
-  "fv_what": "What happens", "fv_bring": "What to bring", "fv_fee": "Fees", "fv_ref": "Do I need a doctor's referral?",
+  "fv_ref": "Do I need a doctor's referral?",
   "ci_desc": "Opening hours and address: 4/F, Yes & Right House, 1–3 Mody Road, Tsim Sha Tsui (Amazing Medical). WhatsApp 5592 9407.",
   "ci_family_h": "For family members",
   "ci_family": "<p>If you are enquiring or booking for a parent or family member, please send a WhatsApp message with:</p><ul><li>a brief description of their condition (for example, where the pain is, or whether they have recently had surgery)</li><li>the times that suit them</li></ul><p>If they have limited mobility or use a wheelchair, please let me know in advance so I can make arrangements.</p>",
@@ -635,16 +642,6 @@ def wayfind(lang):
   </div>
 </section>"""
 
-def teaser(lang):
-    G = XC[lang]
-    return f"""<section class="wrap reveal">
-  <div class="section-head"><h2>{G["page_t"]}</h2><a class="pill line" href="talks-onfield.html">{G["more"]}</a></div>
-  <div class="teaser-grid stagger">
-    <a class="tcard" href="talks-onfield.html#talks"><img src="img/card-talks.jpg" alt="" width="1200" height="600" loading="lazy"><div><h3>{G["talks_h"]}</h3><p>{G["teaser_talks"]}</p></div></a>
-    <a class="tcard" href="talks-onfield.html#onfield"><img src="img/card-onfield.jpg" alt="" width="1200" height="600" loading="lazy"><div><h3>{G["field_h"]}</h3><p>{G["teaser_field"]}</p></div></a>
-  </div>
-</section>"""
-
 def talks_body(lang):
     G, L = XC[lang], T[lang]
     chips = lambda items: "".join(f'<span class="chip-topic">{x}</span>' for x in items)
@@ -686,15 +683,6 @@ def talks_body(lang):
 def build_lang(lang, posts, twins):
     L, K = T[lang], C[lang]
     pages = {}
-    card_imgs = ["img/treatment-room.jpg", "img/gym-area.jpg", None]
-    cards = ""
-    for (h, p_, tag), img in zip(K["cards"], card_imgs):
-        if img:
-            cards += (f'<article class="card"><img src="{img}" alt="" loading="lazy"><div><h3>{h}</h3><p>{p_}</p></div>'
-                      f'<span class="tag chip-dark">{tag}</span></article>')
-        else:
-            cards += (f'<article class="card plain"><div><h3>{h}</h3><p>{p_}</p></div>'
-                      f'<div class="panel glass"><b>{K["panel"][0]}</b><span>{K["panel"][1]}</span></div></article>')
     stats = "".join(f'<div><p class="fig">{f}</p><h3>{h}</h3><p>{d}</p></div>' for f, h, d in K["stats"])
     steps = "".join(f"<li><div><b>{t}</b><span>{d}</span></div></li>" for t, d in K["steps"])
     faq = "".join(
@@ -702,56 +690,39 @@ def build_lang(lang, posts, twins):
         for q, key in K["faq"])
     faq += f'<details><summary>{K["family_q"]}</summary><div class="answer-text"><p>{K["family_a"]}</p></div></details>'
 
-    hero = f"""<section class="wrap hero">
-  <div class="hero-text">
-    <h1>{K["h1"]}</h1>
-    <p class="role">{L["title"]}</p>
-    <p class="lead">{K["lead"]}</p>
-    <div class="actions"><a class="pill solid" href="{L["wa_link"]}">WhatsApp {WA_NUMBER}</a><a class="pill clear" href="clinic-info.html">{L["clinic"]}</a></div>
+    topic_links = "".join(f'<a href="articles.html#{topic_id(t)}">{t}</a>' for t in topics_of(posts))
+    hero = f"""<section class="wrap blog-hero">
+  <div class="bh-text">
+    <h1>{K["blog_h1"]}</h1>
+    <p class="lead">{K["blog_lead"]}</p>
+    <div class="byline"><img src="img/anson-sq.jpg" alt=""><div><b>{L["name_short"]}</b><span>{L["title"]}</span></div></div>
+    {f'<nav class="topic-links" aria-label="{K["topics_label"]}">{topic_links}</nav>' if topic_links else ""}
   </div>
-  <figure class="hero-photo"><img src="img/anson.jpg" alt="{K["photo_alt"]}" width="800" height="1000">
-    <figcaption class="chip chip-dark">{K["chip"]}</figcaption></figure>
-  {hours_card(L)}
+  {hero_post(posts[0], lang) if posts else ""}
 </section>"""
+    more = (f"""<section class="wrap reveal">
+  <div class="section-head"><h2>{L["more_posts"]}</h2><a class="pill line" href="articles.html">{L["all_posts"]}</a></div>
+  {post_grid(posts[1:7], lang, "")}
+</section>""" if len(posts) > 1 else "")
 
-    pages["index.html"] = page(lang, "index.html", L["site_name"], K["home_desc"], hero, f"""<section class="wrap center reveal">
-  <h2>{K["intro_h"]}</h2>
-  <p>{K["intro_p"]}</p>
-</section>
-
-<div class="wrap cards-scroll reveal"><div class="cards stagger">{cards}</div></div>
-
-<section class="wrap statement reveal">
-  <p class="big">{K["statement"]}</p>
-  <div class="stats stagger">{stats}</div>
-</section>
-
-<section class="deep">
-  <div class="wrap">
-    <div class="center reveal"><h2>{K["first_h"]}</h2><p>{K["first_p"]}</p></div>
-    <div class="reveal"><ol class="steps stagger">{steps}</ol></div>
-    <div class="faq reveal">
-      <h2>{K["faq_h"]}</h2>
-      <div class="faq-list">{faq}</div>
-    </div>
-  </div>
-</section>
-
-{teaser(lang)}
-
-{gallery(lang)}
-
-{visit_block(L, lang)}
+    pages["index.html"] = page(lang, "index.html", L["site_name"], K["home_desc"], hero, f"""{more}
 
 <section class="wrap reveal">
-  <div class="section-head"><h2>{L["latest"]}</h2><a class="pill line" href="articles.html">{L["all_posts"]}</a></div>
-  {post_grid(posts[:3], lang, "")}
+  <div class="author-card">
+    <img src="img/anson-sq.jpg" alt="{K["photo_alt"]}" width="400" height="400" loading="lazy">
+    <div class="txt">
+      <h2>{K["author_h"]}</h2>
+      <p>{K["author_p"]}</p>
+      <div class="actions"><a class="pill line" href="about.html">{L["about"] if lang == "en" else "關於我"}</a><a class="pill line" href="clinic-info.html">{L["clinic"]}</a></div>
+    </div>
+  </div>
 </section>""", "index.html", business(lang))
 
     rows = "".join(f"<div><h2>{h}</h2><p>{d}</p></div>" for h, d in K["services_rows"])
     pages["services.html"] = page(lang, "services.html", K["services_t"], K["services_desc"],
         page_head(K["services_t"], K["intro_p"]),
-        f"""<div class="wrap"><div class="prose">
+        f"""<section class="wrap reveal"><div class="stats stagger">{stats}</div></section>
+<div class="wrap"><div class="prose">
   <div class="rows">{rows}</div>
   <p>{K["limits"]}</p>
   <div class="actions"><a class="pill solid" href="first-visit.html">{K["first_visit_link"]}</a><a class="pill line" href="clinic-info.html">{L["clinic"]}</a></div>
@@ -759,17 +730,12 @@ def build_lang(lang, posts, twins):
 
     pages["first-visit.html"] = page(lang, "first-visit.html", K["first_h"], K["fv_desc"],
         page_head(K["first_h"], K["first_p"]),
-        f"""<div class="wrap"><div class="prose">
-  <h2>{K["fv_what"]}</h2>
-  <ol>{"".join(f"<li><b>{t}</b>{K['step_sep']}{d}</li>" for t, d in K["steps"])}</ol>
-  <h2>{K["fv_bring"]}</h2>
-  {K["bring"]}
-  <h2>{K["fv_fee"]}</h2>
-  <p>{K["fee"]}</p>
-  <h2>{K["fv_ref"]}</h2>
-  <p>{K["referral"]}</p>
-  <div class="actions"><a class="pill solid" href="clinic-info.html">{L["clinic"]}</a></div>
-</div></div>""", "first-visit.html")
+        f"""<section class="wrap reveal"><ol class="steps stagger">{steps}</ol></section>
+<div class="wrap"><div class="faq reveal">
+  <h2>{K["faq_h"]}</h2>
+  <div class="faq-list">{faq}</div>
+</div></div>
+<div class="wrap"><div class="actions"><a class="pill solid" href="clinic-info.html">{L["clinic"]}</a></div></div>""", "first-visit.html")
 
     pages["clinic-info.html"] = page(lang, "clinic-info.html", L["clinic"], K["ci_desc"],
         page_head(L["clinic"], L["by_appt"] + ("。" if lang == "zh" else ".")),
