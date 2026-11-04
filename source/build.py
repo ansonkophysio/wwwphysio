@@ -23,7 +23,7 @@ MAP_LINK = "https://maps.app.goo.gl/wyFuP1kzYqcNsBYn6"
 ADDRESS_ZH = "九龍尖沙咀麼地道 1–3 號德拓大廈 4 樓全層（Amazing Medical）"
 ADDRESS_EN = "4/F, Yes & Right House, 1–3 Mody Road, Tsim Sha Tsui, Kowloon (Amazing Medical)"
 INSTAGRAM = "https://www.instagram.com/ansonko_physio/"
-FACEBOOK = ""  # Anson's Facebook page address: paste it here (the old guess was wrong); the footer link appears only when set
+FACEBOOK = "https://www.facebook.com/share/19hdnsqZMk/"  # from Anson, 4 Nov 2026 (share link; the footer link appears only when set)
 
 def asset_version(name):
     return hashlib.sha1(open(os.path.join(ROOT, "src", name), "rb").read()).hexdigest()[:8]
