@@ -27,7 +27,7 @@ FACEBOOK = "https://www.facebook.com/share/19hdnsqZMk/"  # from Anson, 4 Nov 202
 
 # Search engine verification (paste the code from Google Search Console / Bing Webmaster Tools,
 # "HTML tag" method; the meta tag goes on the home page only). Empty = no tag.
-GOOGLE_VERIFY = ""
+GOOGLE_VERIFY = "UKcXeP8IxL6QLpR4eq4nLh6zZ3lVl3P7f-5S3ESjrok"
 BING_VERIFY = ""
 
 # Stable IDs so search engines and AI tools join up the person, the practice and the website.
