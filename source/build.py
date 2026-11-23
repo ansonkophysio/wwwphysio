@@ -25,6 +25,16 @@ ADDRESS_EN = "4/F, Yes & Right House, 1–3 Mody Road, Tsim Sha Tsui, Kowloon (A
 INSTAGRAM = "https://www.instagram.com/ansonko_physio/"
 FACEBOOK = "https://www.facebook.com/share/19hdnsqZMk/"  # from Anson, 4 Nov 2026 (share link; the footer link appears only when set)
 
+# Search engine verification (paste the code from Google Search Console / Bing Webmaster Tools,
+# "HTML tag" method; the meta tag goes on the home page only). Empty = no tag.
+GOOGLE_VERIFY = ""
+BING_VERIFY = ""
+
+# Stable IDs so search engines and AI tools join up the person, the practice and the website.
+PERSON_ID = SITE_URL + "/#anson"
+PRACTICE_ID = SITE_URL + "/#practice"
+WEBSITE_ID = SITE_URL + "/#website"
+
 def asset_version(name):
     return hashlib.sha1(open(os.path.join(ROOT, "src", name), "rb").read()).hexdigest()[:8]
 
@@ -46,6 +56,8 @@ T = {
  "zh": {
   "html_lang": "zh-Hant-HK", "og_locale": "zh_HK", "in_lang": "zh-HK",
   "site_name": "高浩維 Anson Ko｜註冊物理治療師", "sep": "｜",
+  "home_title": "高浩維 Anson Ko｜註冊物理治療師｜尖沙咀", "home": "首頁", "updated": "更新於",
+  "alumni": "香港理工大學", "knows": ["肩頸痛", "腰痛", "膝痛", "運動創傷", "手術後復康"],
   "brand": "高浩維 Anson Ko", "name_short": "高浩維 Anson Ko", "title": "註冊物理治療師",
   "nav": [("articles.html", "文章"), ("about.html", "關於我"), ("talks-onfield.html", "講座及場邊支援"), ("services.html", "服務範圍"),
           ("first-visit.html", "首次診症"), ("clinic-info.html", "診所資料")],
@@ -70,6 +82,8 @@ T = {
  "en": {
   "html_lang": "en-HK", "og_locale": "en_HK", "in_lang": "en-HK",
   "site_name": "Anson Ko | Registered Physiotherapist", "sep": " | ",
+  "home_title": "Anson Ko | Registered Physiotherapist | Tsim Sha Tsui", "home": "Home", "updated": "Updated",
+  "alumni": "The Hong Kong Polytechnic University", "knows": ["Neck and shoulder pain", "Low back pain", "Knee pain", "Sports injuries", "Rehabilitation after surgery"],
   "brand": "Anson Ko 高浩維", "name_short": "Anson Ko 高浩維", "title": "Registered Physiotherapist",
   "nav": [("articles.html", "Articles"), ("about.html", "About"), ("talks-onfield.html", "Talks & on-field"), ("services.html", "Services"),
           ("first-visit.html", "First visit"), ("clinic-info.html", "Clinic info")],
@@ -159,26 +173,56 @@ def jsonld(obj):
     return ('<script type="application/ld+json">'
             + json.dumps(obj, ensure_ascii=False, separators=(",", ":")) + "</script>")
 
+def person(lang):
+    """Anson as one entity. Only the registration and the Board-accepted degree go here:
+    team roles and other certificates stay out of structured data (CoP 9.1-9.2; see Compliance review)."""
+    L = T[lang]
+    return {
+        "@type": "Person", "@id": PERSON_ID,
+        "name": "高浩維 Anson Ko", "alternateName": ["Anson Ko", "高浩維"],
+        "jobTitle": L["title"], "url": url_of(lang, "about.html"), "image": SITE_URL + "/img/anson.jpg",
+        "worksFor": {"@id": PRACTICE_ID},
+        "hasCredential": {"@type": "EducationalOccupationalCredential", "credentialCategory": "license",
+                          "name": "註冊物理治療師 Registered Physiotherapist (Hong Kong)"},
+        "alumniOf": {"@type": "CollegeOrUniversity", "name": L["alumni"]},
+        "knowsAbout": L["knows"], "knowsLanguage": ["yue", "en"],
+        "sameAs": [u for u in (INSTAGRAM, FACEBOOK) if u],
+    }
+
 def business(lang):
     L = T[lang]
     return {
-        "@context": "https://schema.org", "@type": "Physiotherapy",
+        "@type": "Physiotherapy", "@id": PRACTICE_ID,
         "name": L["site_name"], "url": SITE_URL + "/" + PREFIX[lang], "image": SITE_URL + "/img/anson.jpg",
-        "telephone": "+852 5592 9407",
+        "telephone": "+852 5592 9407", "hasMap": MAP_LINK,
         "address": {"@type": "PostalAddress", "streetAddress": L["street"],
                     "addressLocality": L["locality"], "addressRegion": L["region"], "addressCountry": "HK"},
         "openingHoursSpecification": [
             {"@type": "OpeningHoursSpecification",
              "dayOfWeek": ["Tuesday", "Wednesday", "Thursday", "Friday"], "opens": "10:00", "closes": "19:00"},
             {"@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "09:30", "closes": "14:00"}],
-        "employee": {"@type": "Person", "name": "高浩維 Anson Ko", "jobTitle": L["title"]},
+        "employee": {"@id": PERSON_ID},
     }
+
+def website(lang):
+    L = T[lang]
+    return {"@type": "WebSite", "@id": WEBSITE_ID, "url": SITE_URL + "/", "name": L["site_name"],
+            "inLanguage": ["zh-HK", "en-HK"], "publisher": {"@id": PERSON_ID}}
+
+def graph(*nodes):
+    return {"@context": "https://schema.org", "@graph": list(nodes)}
+
+def author_ref(lang):
+    L = T[lang]
+    return {"@type": "Person", "@id": PERSON_ID, "name": "高浩維 Anson Ko", "jobTitle": L["title"],
+            "url": url_of(lang, "about.html")}
 
 def url_of(lang, path):
     full = PREFIX[lang] + path
     return SITE_URL + "/" + (full[:-len("index.html")] if full.endswith("index.html") else full)
 
-def page(lang, path, title, desc, band, body, active=None, ld=None, og_type="website", has_twin=True):
+def page(lang, path, title, desc, band, body, active=None, ld=None, og_type="website", has_twin=True,
+         og_image=None):
     L = T[lang]
     full = PREFIX[lang] + path
     ap = "../" * full.count("/")          # to the site root (shared css, js, images)
@@ -188,7 +232,15 @@ def page(lang, path, title, desc, band, body, active=None, ld=None, og_type="web
     other = "en" if lang == "zh" else "zh"
     twin = path if has_twin else "index.html"
     switch_href = ap + PREFIX[other] + twin
-    full_title = title if title == L["site_name"] else f"{title}{L['sep']}{L['site_name']}"
+    if path == "index.html":
+        full_title = L["home_title"]      # name, title and district: what people search for
+    else:
+        full_title = title if title == L["site_name"] else f"{title}{L['sep']}{L['site_name']}"
+    og_image = og_image or SITE_URL + "/img/anson.jpg"
+    verify = ""
+    if full == "index.html":
+        verify = "".join(f'<meta name="{n}" content="{html.escape(v)}">\n'
+                         for n, v in (("google-site-verification", GOOGLE_VERIFY), ("msvalidate.01", BING_VERIFY)) if v)
     canonical = url_of(lang, path)
     alts = ""
     if has_twin:
@@ -197,14 +249,16 @@ def page(lang, path, title, desc, band, body, active=None, ld=None, og_type="web
                 f'<link rel="alternate" hreflang="x-default" href="{url_of("zh", path)}">\n')
     head_bits = f"""<title>{html.escape(full_title)}</title>
 <meta name="description" content="{html.escape(desc)}">
-<meta name="theme-color" content="#93a8cd">
+{verify}<meta name="theme-color" content="#93a8cd">
 <link rel="canonical" href="{canonical}">
 {alts}<meta property="og:title" content="{html.escape(full_title)}">
 <meta property="og:description" content="{html.escape(desc)}">
 <meta property="og:type" content="{og_type}">
 <meta property="og:url" content="{canonical}">
-<meta property="og:image" content="{SITE_URL}/img/anson.jpg">
+<meta property="og:site_name" content="{html.escape(L["site_name"])}">
+<meta property="og:image" content="{og_image}">
 <meta property="og:locale" content="{L["og_locale"]}">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="color-scheme" content="light">
 <link rel="icon" href="{ap}favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -298,10 +352,38 @@ def hero_post(x, lang):
 def cover_of(x):
     return x.get("cover") or "img/covers/default.svg"
 
-def meta_row(x, lang):
+def meta_row(x, lang, show_updated=False):
     L = T[lang]
-    return (f'<div class="meta-row"><time datetime="{x["date"]}">{fmt_date(x["date"], lang)}</time>'
+    upd = ""
+    if show_updated and x.get("updated") and x["updated"] > x["date"]:
+        upd = (f'<span class="sep"></span><span>{L["updated"]} '
+               f'<time datetime="{x["updated"]}">{fmt_date(x["updated"], lang)}</time></span>')
+    return (f'<div class="meta-row"><time datetime="{x["date"]}">{fmt_date(x["date"], lang)}</time>{upd}'
             f'<span class="sep"></span><span>{L["read_min"].format(n=reading_minutes(x["body"]))}</span></div>')
+
+def share_image(x):
+    """A 1200x675 JPEG made from the article's SVG cover, for link previews (WhatsApp, Threads,
+    Facebook) and the Article image. Falls back to Anson's photo when it can't be made."""
+    cover = x.get("cover", "")
+    if not cover.endswith(".svg"):
+        return SITE_URL + "/img/anson.jpg"
+    rel = f'img/share/{x["slug"]}.jpg'
+    dst = os.path.join(ROOT, "src", rel)
+    src = os.path.join(ROOT, "src", cover)
+    if not os.path.exists(dst) or os.path.getmtime(dst) < os.path.getmtime(src):
+        if not shutil.which("rsvg-convert"):
+            return SITE_URL + "/img/anson.jpg" if not os.path.exists(dst) else SITE_URL + "/" + rel
+        try:
+            from PIL import Image
+            import subprocess, tempfile
+            os.makedirs(os.path.dirname(dst), exist_ok=True)
+            with tempfile.NamedTemporaryFile(suffix=".png") as tmp:
+                subprocess.run(["rsvg-convert", "-w", "1200", "-h", "675", "-o", tmp.name, src], check=True)
+                Image.open(tmp.name).convert("RGB").save(dst, "JPEG", quality=85, optimize=True, progressive=True)
+        except Exception as e:  # keep building; the photo is a fine fallback
+            print(f"share image for {x['slug']} not made: {e}")
+            return SITE_URL + "/img/anson.jpg"
+    return SITE_URL + "/" + rel
 
 def post_grid(posts, lang, lp):
     items = "".join(
@@ -354,7 +436,7 @@ def article_page(x, posts, lang, twins):
   <nav class="crumbs" aria-label="{L["crumbs"]}"><a href="../articles.html">{L["articles"]}</a><span aria-hidden="true">›</span><span class="chip-topic">{x.get("topic", "")}</span></nav>
   <h1>{x["title"]}</h1>
   <div class="byline"><img src="img/anson-sq.jpg" alt=""><div><b>{L["name_short"]}</b><span>{L["title"]}</span></div></div>
-  {meta_row(x, lang)}
+  {meta_row(x, lang, show_updated=True)}
 </div>"""
     body = f"""<div class="progress" aria-hidden="true"></div>
 <div class="wrap cover-wrap"><img src="{cover_of(x)}" alt="{x.get("cover_alt", "")}"></div>
@@ -371,15 +453,25 @@ def article_page(x, posts, lang, twins):
   </article>
 </div>
 {more}"""
-    ld = {"@context": "https://schema.org", "@type": "Article", "headline": x["title"],
-          "description": x["description"], "inLanguage": L["in_lang"],
-          "datePublished": x["date"], "dateModified": x["updated"],
-          "author": {"@type": "Person", "name": "高浩維 Anson Ko", "jobTitle": L["title"],
-                     "url": url_of(lang, "about.html")},
-          "mainEntityOfPage": url_of(lang, f'articles/{x["slug"]}.html'),
-          "image": SITE_URL + "/img/anson.jpg"}
+    img = share_image(x)
+    article_url = url_of(lang, f'articles/{x["slug"]}.html')
+    refs = re.findall(r'<ol class="refs">(.*?)</ol>', x["body"], re.S)
+    cites = re.findall(r'href="(https?://[^"]+)"', refs[0]) if refs else []
+    art = {"@type": "Article", "@id": article_url + "#article", "headline": x["title"],
+           "description": x["description"], "inLanguage": L["in_lang"],
+           "datePublished": x["date"], "dateModified": x["updated"],
+           "author": author_ref(lang), "publisher": {"@id": PERSON_ID},
+           "mainEntityOfPage": article_url, "image": img, "isPartOf": {"@id": WEBSITE_ID}}
+    if x.get("topic"):
+        art["about"] = {"@type": "Thing", "name": x["topic"]}
+    if cites:
+        art["citation"] = cites
+    crumbs = {"@type": "BreadcrumbList", "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": L["home"], "item": url_of(lang, "index.html")},
+        {"@type": "ListItem", "position": 2, "name": L["articles"], "item": url_of(lang, "articles.html")},
+        {"@type": "ListItem", "position": 3, "name": x["title"]}]}
     return page(lang, f'articles/{x["slug"]}.html', x["title"], x["description"], band, body,
-                "articles.html", ld, "article", has_twin=x["slug"] in twins)
+                "articles.html", graph(art, crumbs), "article", has_twin=x["slug"] in twins, og_image=img)
 
 def articles_body(posts, lang):
     L = T[lang]
@@ -716,7 +808,7 @@ def build_lang(lang, posts, twins):
       <div class="actions"><a class="pill line" href="about.html">{L["about"] if lang == "en" else "關於我"}</a><a class="pill line" href="clinic-info.html">{L["clinic"]}</a></div>
     </div>
   </div>
-</section>""", "index.html", business(lang))
+</section>""", "index.html", graph(website(lang), business(lang), person(lang)))
 
     rows = "".join(f"<div><h2>{h}</h2><p>{d}</p></div>" for h, d in K["services_rows"])
     pages["services.html"] = page(lang, "services.html", K["services_t"], K["services_desc"],
@@ -747,7 +839,7 @@ def build_lang(lang, posts, twins):
   <p>{K["referral"]}</p>
   <h2>{K["ci_family_h"]}</h2>
   {K["ci_family"]}
-</div></div>""", "clinic-info.html", business(lang))
+</div></div>""", "clinic-info.html", graph(business(lang), person(lang)))
 
     pages["about.html"] = page(lang, "about.html", L["about"] if lang == "en" else "關於我", K["about_desc"],
         page_head(L["about"] if lang == "en" else "關於我", K["about_intro"]),
@@ -758,7 +850,10 @@ def build_lang(lang, posts, twins):
     <p>{K["ig_line"].format(ig=INSTAGRAM)}</p>
     <div class="actions"><a class="pill solid" href="clinic-info.html">{L["clinic"]}</a><a class="pill line" href="first-visit.html">{K["first_visit_link"]}</a></div>
   </div>
-</div>""", "about.html")
+</div>""", "about.html", graph(
+        {"@type": "ProfilePage", "@id": url_of(lang, "about.html") + "#profile", "url": url_of(lang, "about.html"),
+         "inLanguage": L["in_lang"], "mainEntity": {"@id": PERSON_ID}, "isPartOf": {"@id": WEBSITE_ID}},
+        person(lang), business(lang)))
 
     G = XC[lang]
     pages["talks-onfield.html"] = page(lang, "talks-onfield.html", G["page_t"], G["page_desc"],
@@ -803,8 +898,16 @@ def build():
         '<rect width="64" height="64" rx="16" fill="url(#g)"/>'
         '<text x="32" y="43" font-size="32" text-anchor="middle" fill="#ffffff" font-family="sans-serif">高</text></svg>')
     if not PREVIEW:
+        lastmod = {}                          # only dates we actually know: article updates
+        for lang in LANGS:
+            if posts[lang]:
+                newest = max(x["updated"] for x in posts[lang])
+                lastmod[PREFIX[lang] + "index.html"] = lastmod[PREFIX[lang] + "articles.html"] = newest
+                for x in posts[lang]:
+                    lastmod[PREFIX[lang] + f'articles/{x["slug"]}.html'] = x["updated"]
         urls = [u for u in written if not u.endswith("404.html")]
-        sm = "".join(f"<url><loc>{SITE_URL}/{u[:-len('index.html')] if u.endswith('index.html') else u}</loc></url>" for u in urls)
+        sm = "".join(f"<url><loc>{SITE_URL}/{u[:-len('index.html')] if u.endswith('index.html') else u}</loc>"
+                     + (f"<lastmod>{lastmod[u]}</lastmod>" if u in lastmod else "") + "</url>" for u in urls)
         open(os.path.join(OUT, "sitemap.xml"), "w").write(
             f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{sm}</urlset>')
         open(os.path.join(OUT, "robots.txt"), "w").write(f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}/sitemap.xml\n")
