@@ -2,33 +2,17 @@
 (() => {
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  // Sections ease in as they scroll into view
-  const items = document.querySelectorAll(".reveal");
-  if ("IntersectionObserver" in window && !reduce) {
-    const io = new IntersectionObserver((entries) => {
-      for (const e of entries) {
-        if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
-      }
-    }, { threshold: 0.08, rootMargin: "0px 0px -6% 0px" });
-    items.forEach((el) => io.observe(el));
-  } else {
-    items.forEach((el) => el.classList.add("in"));
-  }
-
-  // A soft ripple where you tap buttons and cards
-  if (!reduce) {
-    document.addEventListener("pointerdown", (ev) => {
-      const t = ev.target.closest(".pill, .card, .post-card, .featured, .steps li, .filters button, .tcard, .next-read, .topic-links a");
-      if (!t) return;
-      const r = t.getBoundingClientRect();
-      const s = document.createElement("span");
-      s.className = "ripple";
-      s.style.left = ev.clientX - r.left + "px";
-      s.style.top = ev.clientY - r.top + "px";
-      s.style.setProperty("--rs", Math.ceil(Math.hypot(r.width, r.height) / 6));
-      t.appendChild(s);
-      s.addEventListener("animationend", () => s.remove());
-    });
+  // Exercise pictures: the movement cue plays once when the card is mostly in view; tapping replays it
+  const pics = document.querySelectorAll(".move .illus");
+  if (pics.length && !reduce) {
+    const play = (svg) => { svg.classList.remove("play", "wait"); void svg.getBoundingClientRect(); svg.classList.add("play"); };
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver((entries) => {
+        for (const e of entries) if (e.isIntersecting) { play(e.target); io.unobserve(e.target); }
+      }, { threshold: 0.6 });
+      pics.forEach((svg) => { svg.classList.add("wait"); io.observe(svg); });
+    } else pics.forEach(play);
+    pics.forEach((svg) => svg.addEventListener("click", () => play(svg)));
   }
 
   // Short silent clips: play while on screen, never with reduced motion; the button pauses and resumes
