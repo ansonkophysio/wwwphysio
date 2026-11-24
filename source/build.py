@@ -30,6 +30,14 @@ FACEBOOK = "https://www.facebook.com/share/19hdnsqZMk/"  # from Anson, 4 Nov 202
 GOOGLE_VERIFY = "UKcXeP8IxL6QLpR4eq4nLh6zZ3lVl3P7f-5S3ESjrok"
 BING_VERIFY = ""
 
+# The Physiotherapists Board's public list of registrants. Linking to it is allowed on a practice
+# website (CoP 6.3.5.3(a): a bona fide database of all registered physiotherapists in Hong Kong).
+REGISTER_URL = "https://www.ahp-council.org.hk/pt/en/content.php?page=reg_reg"
+
+# Topic groups for "more articles": same topic first, then the same group.
+TOPIC_GROUPS = [{"肩頸痛", "腰痛", "Neck & shoulders", "Low back pain"},
+                {"膝痛", "運動創傷", "Knee pain", "Sports injuries"}]
+
 # Stable IDs so search engines and AI tools join up the person, the practice and the website.
 PERSON_ID = SITE_URL + "/#anson"
 PRACTICE_ID = SITE_URL + "/#practice"
@@ -76,6 +84,7 @@ T = {
   "read_min": "閱讀時間約 {n} 分鐘", "crumbs": "位置", "articles": "文章", "toc": "本文內容",
   "reel": "相關短片：", "reel_link": "在 Instagram 觀看",
   "author_line": "註冊物理治療師，於尖沙咀 Amazing Medical 應診。", "about": "關於我",
+  "editorial": "文章如何撰寫",
   "article_note": "本文只供一般參考，不能取代專業診斷及治療。如症狀持續或出現警號，請諮詢醫生或物理治療師。",
   "address_line": ADDRESS_ZH, "street": "麼地道 1–3 號德拓大廈 4 樓全層", "locality": "尖沙咀", "region": "九龍",
  },
@@ -102,6 +111,7 @@ T = {
   "read_min": "{n} min read", "crumbs": "Breadcrumb", "articles": "Articles", "toc": "In this article",
   "reel": "Related video: ", "reel_link": "watch on Instagram",
   "author_line": "Registered Physiotherapist, seeing patients at Amazing Medical, Tsim Sha Tsui.", "about": "About me",
+  "editorial": "How these articles are written",
   "article_note": "This article is for general reference only and does not replace professional diagnosis or treatment. If symptoms persist or warning signs appear, please see a doctor or physiotherapist.",
   "address_line": ADDRESS_EN, "street": "4/F, Yes & Right House, 1–3 Mody Road", "locality": "Tsim Sha Tsui", "region": "Kowloon",
  },
@@ -164,7 +174,7 @@ def footer(L, lp=""):
     <div><h2>{L["contact"]}</h2><p>WhatsApp: <a href="{L["wa_link"]}">{WA_NUMBER}</a></p>
       <p><a href="{INSTAGRAM}">Instagram</a>{f'　<a href="{FACEBOOK}">Facebook</a>' if FACEBOOK else ""}</p></div>
   </div>
-  <div class="fine"><span>{L["fine"]}</span><span>© {date.today().year} 高浩維 Anson Ko</span></div>
+  <div class="fine"><span>{L["fine"]} <a href="{lp}editorial.html">{L["editorial"]}</a></span><span>© {date.today().year} 高浩維 Anson Ko</span></div>
   <div class="wordmark" aria-hidden="true">Anson Ko</div>
 </div>
 </footer>"""
@@ -183,9 +193,12 @@ def person(lang):
         "jobTitle": L["title"], "url": url_of(lang, "about.html"), "image": SITE_URL + "/img/anson.jpg",
         "worksFor": {"@id": PRACTICE_ID},
         "hasCredential": {"@type": "EducationalOccupationalCredential", "credentialCategory": "license",
-                          "name": "註冊物理治療師 Registered Physiotherapist (Hong Kong)"},
+                          "name": "註冊物理治療師 Registered Physiotherapist (Hong Kong)",
+                          "recognizedBy": {"@type": "Organization", "name": "Physiotherapists Board of Hong Kong"},
+                          "url": REGISTER_URL},
         "alumniOf": {"@type": "CollegeOrUniversity", "name": L["alumni"]},
         "knowsAbout": L["knows"], "knowsLanguage": ["yue", "en"],
+        "publishingPrinciples": url_of(lang, "editorial.html"),
         "sameAs": [u for u in (INSTAGRAM, FACEBOOK) if u],
     }
 
@@ -207,7 +220,8 @@ def business(lang):
 def website(lang):
     L = T[lang]
     return {"@type": "WebSite", "@id": WEBSITE_ID, "url": SITE_URL + "/", "name": L["site_name"],
-            "inLanguage": ["zh-HK", "en-HK"], "publisher": {"@id": PERSON_ID}}
+            "inLanguage": ["zh-HK", "en-HK"], "publisher": {"@id": PERSON_ID},
+            "publishingPrinciples": url_of(lang, "editorial.html")}
 
 def graph(*nodes):
     return {"@context": "https://schema.org", "@graph": list(nodes)}
@@ -430,7 +444,11 @@ def article_page(x, posts, lang, twins):
         next_card = (f'<a class="next-read" href="{nxt["slug"]}.html"><span class="label">{L["next_read"]}</span>'
                      f'<span class="t">{nxt["title"]}</span>'
                      f'<span class="meta">{L["read_min"].format(n=reading_minutes(nxt["body"]))}</span></a>')
-    others = [o for o in posts if o["slug"] not in (x["slug"], x.get("next"))][:3]
+    def closeness(o):                     # same topic first, then the same group, then the rest
+        if o.get("topic") == x.get("topic"):
+            return 0
+        return 1 if any(o.get("topic") in g and x.get("topic") in g for g in TOPIC_GROUPS) else 2
+    others = sorted((o for o in posts if o["slug"] not in (x["slug"], x.get("next"))), key=closeness)[:3]
     more = (f'<section class="wrap reveal"><h2>{L["more_posts"]}</h2>{post_grid(others, lang, "../")}</section>' if others else "")
     band = f"""<div class="wrap article-head">
   <nav class="crumbs" aria-label="{L["crumbs"]}"><a href="../articles.html">{L["articles"]}</a><span aria-hidden="true">›</span><span class="chip-topic">{x.get("topic", "")}</span></nav>
@@ -448,7 +466,7 @@ def article_page(x, posts, lang, twins):
     {reel}
     {next_card}
     <div class="author-box"><img src="img/anson-sq.jpg" alt="{L["name_short"]}">
-      <p><b>{L["name_short"]}</b><br>{L["author_line"]}<a href="../about.html">{L["about"]}</a></p></div>
+      <p><b>{L["name_short"]}</b><br>{L["author_line"]}<a href="../about.html">{L["about"]}</a>　<a href="../editorial.html">{L["editorial"]}</a></p></div>
     <p class="note">{L["article_note"]}</p>
   </article>
 </div>
@@ -461,7 +479,8 @@ def article_page(x, posts, lang, twins):
            "description": x["description"], "inLanguage": L["in_lang"],
            "datePublished": x["date"], "dateModified": x["updated"],
            "author": author_ref(lang), "publisher": {"@id": PERSON_ID},
-           "mainEntityOfPage": article_url, "image": img, "isPartOf": {"@id": WEBSITE_ID}}
+           "mainEntityOfPage": article_url, "image": img, "isPartOf": {"@id": WEBSITE_ID},
+           "publishingPrinciples": url_of(lang, "editorial.html")}
     if x.get("topic"):
         art["about"] = {"@type": "Thing", "name": x["topic"]}
     if cites:
@@ -530,6 +549,22 @@ C = {
   "nf_t": "找不到頁面", "nf_link": "返回首頁",
   "about_desc": "高浩維 Anson Ko，香港註冊物理治療師，香港水球隊物理治療師，前香港水球隊運動員（2017–2024），於尖沙咀 Amazing Medical 應診。",
   "about_intro": "香港註冊物理治療師。前香港水球隊運動員，現任香港水球隊物理治療師。",
+  "verify_line": "我的註冊資料可於物理治療師管理委員會的<a href=\"{url}\">註冊名單</a>核實。",
+  "ed_t": "文章如何撰寫",
+  "ed_desc": "高浩維 Anson Ko 的健康文章由誰撰寫、參考甚麼資料、如何註明日期及更新，以及文章的限制。",
+  "ed_intro": "本網站的文章由誰撰寫、根據甚麼資料，以及有甚麼限制。",
+  "ed_body": """<h2>作者</h2>
+    <p>本網站所有文章均由高浩維 Anson Ko 撰寫。我是香港註冊物理治療師，註冊資料可於物理治療師管理委員會的<a href="{url}">註冊名單</a>核實。</p>
+    <h2>資料來源</h2>
+    <p>文章內容以已發表的研究及臨床指引為依據。每篇文章的文末均列出參考資料，並連結至 PubMed 或出版機構的網頁，方便讀者自行查閱。如研究結果仍未有定論，文章會清楚說明。</p>
+    <h2>日期及更新</h2>
+    <p>每篇文章均註明發佈日期；內容如有修訂，會同時註明更新日期。如有重要的新研究或指引，我會檢視並更新相關文章。</p>
+    <h2>獨立性</h2>
+    <p>本網站不刊登廣告，亦不接受贊助。文章不推介任何產品或品牌。</p>
+    <h2>文章的限制</h2>
+    <p>文章只提供一般健康教育資料，不能取代專業診斷及治療。每篇文章均列出應及早求醫的情況；如出現這些情況，或症狀持續，請諮詢醫生或物理治療師。</p>
+    <h2>語言</h2>
+    <p>文章以書面語撰寫，並使用香港人常用的說法，例如「頸梗膊痛」及「拗柴」，方便讀者理解。網站的文章同時提供英文版本。</p>""",
   "bio": """<h2>你好，我是高浩維 Anson Ko</h2>
     <p class="lead">我是香港註冊物理治療師，於尖沙咀 Amazing Medical 應診。</p>
     <p>2017 至 2024 年，我是香港水球隊運動員，曾代表香港參加第十九屆亞運會及亞洲水球錦標賽。七年的訓練及比賽，讓我深切體會運動員所承受的訓練量和比賽壓力，以及受傷後希望盡快重返訓練的心情。</p>
@@ -591,6 +626,22 @@ C = {
   "nf_t": "Page not found", "nf_link": "Back to home",
   "about_desc": "Anson Ko is a Registered Physiotherapist in Hong Kong, Team Physiotherapist for the Hong Kong Water Polo Team and a former Hong Kong water polo player (2017–2024), seeing patients at Amazing Medical, Tsim Sha Tsui.",
   "about_intro": "Registered Physiotherapist in Hong Kong. Former Hong Kong Water Polo Team player, now the team's physiotherapist.",
+  "verify_line": "You can check my registration on the Physiotherapists Board's <a href=\"{url}\">list of registrants</a>.",
+  "ed_t": "How these articles are written",
+  "ed_desc": "Who writes Anson Ko's health articles, what they are based on, how they are dated and updated, and their limits.",
+  "ed_intro": "Who writes the articles on this site, what they are based on, and their limits.",
+  "ed_body": """<h2>Author</h2>
+    <p>All articles on this site are written by Anson Ko. I am a Registered Physiotherapist in Hong Kong; you can check my registration on the Physiotherapists Board's <a href="{url}">list of registrants</a>.</p>
+    <h2>Sources</h2>
+    <p>Articles are based on published research and clinical guidelines. Each article ends with its references, linked to PubMed or the publisher, so you can read them yourself. Where the evidence is not settled, the article says so.</p>
+    <h2>Dates and updates</h2>
+    <p>Each article shows the date it was published, and the date it was updated if the content has been revised. When important new research or guidelines appear, I review and update the articles they affect.</p>
+    <h2>Independence</h2>
+    <p>This site carries no advertising and accepts no sponsorship. The articles do not recommend any product or brand.</p>
+    <h2>Limits</h2>
+    <p>The articles are general health education and do not replace professional diagnosis or treatment. Each article lists the situations in which you should see a doctor promptly; if any apply, or your symptoms persist, please see a doctor or physiotherapist.</p>
+    <h2>Language</h2>
+    <p>The Chinese articles are written in standard written Chinese, using the words people in Hong Kong commonly use, such as 頸梗膊痛 and 拗柴. The articles are also available in English.</p>""",
   "bio": """<h2>Hi, I'm Anson Ko</h2>
     <p class="lead">I'm a Registered Physiotherapist in Hong Kong, seeing patients at Amazing Medical in Tsim Sha Tsui.</p>
     <p>From 2017 to 2024 I played for the Hong Kong Water Polo Team, representing Hong Kong at the 19th Asian Games and the Asian Water Polo Championship. Seven years of training and competing showed me what athletes deal with every day: the training volume, the pressure of competition, and the urge to get back in the water after an injury.</p>
@@ -847,6 +898,7 @@ def build_lang(lang, posts, twins):
   <figure><img src="img/anson.jpg" alt="{K["photo_alt"]}" width="800" height="1000"></figure>
   <div class="prose bio">
     {K["bio"]}
+    <p>{K["verify_line"].format(url=REGISTER_URL)}</p>
     <p>{K["ig_line"].format(ig=INSTAGRAM)}</p>
     <div class="actions"><a class="pill solid" href="clinic-info.html">{L["clinic"]}</a><a class="pill line" href="first-visit.html">{K["first_visit_link"]}</a></div>
   </div>
@@ -854,6 +906,16 @@ def build_lang(lang, posts, twins):
         {"@type": "ProfilePage", "@id": url_of(lang, "about.html") + "#profile", "url": url_of(lang, "about.html"),
          "inLanguage": L["in_lang"], "mainEntity": {"@id": PERSON_ID}, "isPartOf": {"@id": WEBSITE_ID}},
         person(lang), business(lang)))
+
+    pages["editorial.html"] = page(lang, "editorial.html", K["ed_t"], K["ed_desc"],
+        page_head(K["ed_t"], K["ed_intro"]),
+        f"""<div class="wrap"><div class="prose">
+    {K["ed_body"].format(url=REGISTER_URL)}
+  </div></div>""", None, graph(
+        {"@type": "WebPage", "@id": url_of(lang, "editorial.html"), "url": url_of(lang, "editorial.html"),
+         "name": K["ed_t"], "inLanguage": L["in_lang"], "about": {"@id": WEBSITE_ID},
+         "author": {"@id": PERSON_ID}, "isPartOf": {"@id": WEBSITE_ID}},
+        person(lang)))
 
     G = XC[lang]
     pages["talks-onfield.html"] = page(lang, "talks-onfield.html", G["page_t"], G["page_desc"],
