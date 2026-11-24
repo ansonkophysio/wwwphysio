@@ -86,7 +86,7 @@ T = {
           ("first-visit.html", "首次診症"), ("clinic-info.html", "診所資料")],
   "nav_label": "主要", "menu": "選單", "switch": "EN", "switch_label": "English version",
   "wa": "WhatsApp 查詢", "map": "Google 地圖", "clinic": "診所資料",
-  "wa_link": wa("你好，我想查詢物理治療"), "wa_talks_link": wa("你好，我想查詢講座或場邊支援"),
+  "wa_link": wa("你好，我想查詢物理治療"), "wa_book": "以 WhatsApp 預約", "wa_book_link": wa("你好，我想預約物理治療。"), "wa_talks_link": wa("你好，我想查詢講座或場邊支援"),
   "days": "一二三四五六日",
   "hours_title": "應診時間", "tue_fri": "星期二至五", "sat": "星期六", "sun_mon": "星期日、一", "ph": "公眾假期",
   "closed": "休息", "hours_note": "公眾假期休息。所有診症均需預約。", "by_appt": "所有診症均需預約",
@@ -113,7 +113,7 @@ T = {
           ("first-visit.html", "First visit"), ("clinic-info.html", "Clinic info")],
   "nav_label": "Main", "menu": "Menu", "switch": "中文", "switch_label": "中文版",
   "wa": "WhatsApp", "map": "Google Maps", "clinic": "Clinic info",
-  "wa_link": wa("Hi, I'd like to ask about physiotherapy"), "wa_talks_link": wa("Hi, I'd like to ask about a talk or on-field support"),
+  "wa_link": wa("Hi, I'd like to ask about physiotherapy"), "wa_book": "Book on WhatsApp", "wa_book_link": wa("Hi, I'd like to book a physiotherapy appointment."), "wa_talks_link": wa("Hi, I'd like to ask about a talk or on-field support"),
   "days": "MTWTFSS",
   "hours_title": "Opening hours", "tue_fri": "Tue–Fri", "sat": "Sat", "sun_mon": "Sun, Mon", "ph": "Public holidays",
   "closed": "Closed", "hours_note": "Closed on public holidays. By appointment only.", "by_appt": "By appointment only",
@@ -157,7 +157,7 @@ def visit_block(L, lang, both_addresses=False):
       <div><dt>{L["hours_title"]}</dt><dd>{hours_dl(L)}</dd></div>
       <div><dt>WhatsApp</dt><dd>{WA_NUMBER}<br><span class="small">{L["by_appt"]}</span></dd></div>
     </dl>
-    <div class="actions"><a class="pill solid" href="{L["wa_link"]}">{L["wa"]}</a><a class="pill line" href="{MAP_LINK}">{L["map"]}</a></div>
+    <div class="actions"><a class="pill solid" href="{L["wa_book_link"]}">{L["wa_book"]}</a><a class="pill line" href="{MAP_LINK}">{L["map"]}</a></div>
   </div>
 </section>"""
 
@@ -903,7 +903,7 @@ def build_lang(lang, posts, twins):
 <div class="wrap"><div class="prose">
   <div class="rows">{rows}</div>
   <p>{K["limits"]}</p>
-  <div class="actions"><a class="pill solid" href="first-visit.html">{K["first_visit_link"]}</a><a class="pill line" href="clinic-info.html">{L["clinic"]}</a></div>
+  <div class="actions"><a class="pill solid" href="{L["wa_book_link"]}">{L["wa_book"]}</a><a class="pill line" href="first-visit.html">{K["first_visit_link"]}</a><a class="pill line" href="clinic-info.html">{L["clinic"]}</a></div>
 </div></div>""", "services.html")
 
     pages["first-visit.html"] = page(lang, "first-visit.html", K["first_h"], K["fv_desc"],
@@ -913,7 +913,7 @@ def build_lang(lang, posts, twins):
   <h2>{K["faq_h"]}</h2>
   <div class="faq-list">{faq}</div>
 </div></div>
-<div class="wrap"><div class="actions"><a class="pill solid" href="clinic-info.html">{L["clinic"]}</a></div></div>""", "first-visit.html")
+<div class="wrap"><div class="actions"><a class="pill solid" href="{L["wa_book_link"]}">{L["wa_book"]}</a><a class="pill line" href="clinic-info.html">{L["clinic"]}</a></div></div>""", "first-visit.html")
 
     pages["clinic-info.html"] = page(lang, "clinic-info.html", L["clinic"], K["ci_desc"],
         page_head(L["clinic"], L["by_appt"] + ("。" if lang == "zh" else ".")),
