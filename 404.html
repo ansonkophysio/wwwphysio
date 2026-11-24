@@ -23,9 +23,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500&family=Chiron+Hei+HK:wght@300;400;500;700&display=swap">
-<link rel="stylesheet" href="/style.css?v=c16501ba">
-<script>document.documentElement.classList.add("js")</script>
-<script src="/site.js?v=370e18be" defer></script>
+<link rel="stylesheet" href="/style.css?v=750aa70a">
+<script>document.documentElement.classList.add("js");(()=>{const C='.post-card,.featured,.hero-post',I='.thumb img',K='.cover-wrap img',u=h=>{try{const x=new URL(h,location.href);return x.origin+x.pathname}catch(e){return''}},card=h=>{const t=u(h);for(const a of document.querySelectorAll(C+' a')){if(u(a.href)===t)return a.closest(C).querySelector(I)}},clear=()=>document.querySelectorAll(I+','+K).forEach(e=>e.style.viewTransitionName=''),set=(e,v)=>{if(e){e.style.viewTransitionName='cover';v.finished.finally(clear)}};addEventListener('pageswap',e=>{clear();if(!e.viewTransition||!e.activation||!e.activation.entry)return;const to=e.activation.entry.url;set(card(to)||document.querySelector(K),e.viewTransition)});addEventListener('pagereveal',e=>{if(!e.viewTransition||!window.navigation||!navigation.activation||!navigation.activation.from)return;const from=navigation.activation.from.url;set(document.querySelector(K)||card(from),e.viewTransition)});addEventListener('pageshow',e=>{if(e.persisted)clear()})})();</script>
+<script src="/site.js?v=3ca749b7" defer></script>
 
 </head>
 <body>

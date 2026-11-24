@@ -10,6 +10,21 @@ import hashlib, html, json, os, re, shutil, sys
 from urllib.parse import quote
 from datetime import date
 
+# Runs in <head> so it is ready before the first frame (pagereveal needs that). When a link to an article
+# is followed from a card, the card's picture and the article cover share the name "cover" for that one
+# page change, so the browser grows one into the other; Back shrinks it again. Browsers without
+# cross-document view transitions simply ignore this.
+COVER_MORPH = ("(()=>{const C='.post-card,.featured,.hero-post',I='.thumb img',K='.cover-wrap img',"
+  "u=h=>{try{const x=new URL(h,location.href);return x.origin+x.pathname}catch(e){return''}},"
+  "card=h=>{const t=u(h);for(const a of document.querySelectorAll(C+' a')){if(u(a.href)===t)return a.closest(C).querySelector(I)}},"
+  "clear=()=>document.querySelectorAll(I+','+K).forEach(e=>e.style.viewTransitionName=''),"
+  "set=(e,v)=>{if(e){e.style.viewTransitionName='cover';v.finished.finally(clear)}};"
+  "addEventListener('pageswap',e=>{clear();if(!e.viewTransition||!e.activation||!e.activation.entry)return;"
+  "const to=e.activation.entry.url;set(card(to)||document.querySelector(K),e.viewTransition)});"
+  "addEventListener('pagereveal',e=>{if(!e.viewTransition||!window.navigation||!navigation.activation||!navigation.activation.from)return;"
+  "const from=navigation.activation.from.url;set(document.querySelector(K)||card(from),e.viewTransition)});"
+  "addEventListener('pageshow',e=>{if(e.persisted)clear()})})();")
+
 ROOT = os.path.dirname(os.path.abspath(__file__))  # this folder holds posts/, posts-en/ and src/
 PREVIEW = "--preview" in sys.argv
 OUT = os.path.join(ROOT, "preview" if PREVIEW else "dist")
@@ -279,7 +294,7 @@ def page(lang, path, title, desc, band, body, active=None, ld=None, og_type="web
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="{FONTS}">
 <link rel="stylesheet" href="{ap}style.css?v={CSS_V}">
-<script>document.documentElement.classList.add("js")</script>
+<script>document.documentElement.classList.add("js");{COVER_MORPH}</script>
 <script src="{ap}site.js?v={JS_V}" defer></script>
 {jsonld(ld) if ld else ""}"""
     for attr in ("src", "poster"):
@@ -433,9 +448,29 @@ def add_heading_ids(body):
     body = re.sub(r"<h2>(.*?)</h2>", repl, body)
     return body, toc
 
+def inline_illus(body):
+    """Exercise pictures go inline so site.js can play their movement cue: the arrow (dark stroke,
+    width 7 or 8, or the blue arrowhead in shoulder circles) draws in and the dashed path traces.
+    Each picture keeps its alt text as the accessible name."""
+    def one(m):
+        name, alt = m.group(1), m.group(2)
+        svg = open(os.path.join(ROOT, "src", "img", "illus", name + ".svg"), encoding="utf-8").read().strip()
+        svg = re.sub(r'\s(role|aria-label)="[^"]*"', "", svg, count=2)
+        svg = svg.replace("<svg ", f'<svg class="illus" role="img" aria-label="{alt}" width="480" height="360" ', 1)
+        def tag(p):
+            t = p.group(0)
+            if "stroke-dasharray" in t:
+                return t.replace("<path ", '<path class="ghost" ', 1)
+            if re.search(r'stroke="#1b2740" stroke-width="[78]"', t) or ('stroke="#3a5899"' in t and 'fill="none"' in t):
+                return t.replace("<path ", '<path class="cue" pathLength="1" ', 1)
+            return t
+        return re.sub(r"<path [^>]*>", tag, svg)
+    return re.sub(r'<img src="img/illus/([\w-]+)\.svg" alt="([^"]*)"[^>]*>', one, body)
+
 def article_page(x, posts, lang, twins):
     L = T[lang]
     body_html, toc = add_heading_ids(x["body"])
+    body_html = inline_illus(body_html)
     toc_items = "".join(f'<li><a href="#{i}">{t}</a></li>' for i, t in toc)
     reel = (f'<p>{L["reel"]}<a href="{x["reel"]}">{L["reel_link"]}</a></p>' if x.get("reel") else "")
     nxt = next((o for o in posts if o["slug"] == x.get("next")), None)
